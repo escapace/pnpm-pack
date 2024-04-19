@@ -4,10 +4,10 @@ import fse from 'fs-extra'
 import assert from 'node:assert'
 import { mkdtemp } from 'node:fs/promises'
 import { isNativeError } from 'node:util/types'
-import os from 'os'
-import path from 'path'
+import os from 'node:os'
+import path from 'node:path'
 import semver from 'semver'
-import { fileURLToPath } from 'url'
+import { fileURLToPath } from 'node:url'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
 import { readPackageJSON } from './utilities/read-package-json'
@@ -93,8 +93,8 @@ export async function packWorkspace() {
         version
       ].filter((value): value is string => typeof value === 'string'),
       {
-        stdio: 'inherit',
-        cwd
+        cwd,
+        stdio: 'inherit'
       }
     )
 
@@ -105,8 +105,8 @@ export async function packWorkspace() {
     assert(fse.exists(pathFileArchive))
 
     await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
-      stdio: 'inherit',
-      cwd
+      cwd,
+      stdio: 'inherit'
     })
 
     const { lockfile } = await readWantedLockfileAndAutofixConflicts(
@@ -135,8 +135,8 @@ export async function packWorkspace() {
       'tar',
       ['-czf', pathFileArchive, '-C', pathDirectoryTemporary, 'package'],
       {
-        stdio: 'inherit',
-        cwd
+        cwd,
+        stdio: 'inherit'
       }
     )
 
@@ -147,8 +147,8 @@ export async function packWorkspace() {
       path.join(pathDirectoryDestination, nameArchive),
       { overwrite: true }
     )
-  } catch (e) {
-    error = isNativeError(e) ? e : new Error('Unknown Error')
+  } catch (error_) {
+    error = isNativeError(error_) ? error_ : new Error('Unknown Error')
   }
 
   await execa(
@@ -157,14 +157,14 @@ export async function packWorkspace() {
       (value): value is string => typeof value === 'string'
     ),
     {
-      stdio: 'inherit',
-      cwd
+      cwd,
+      stdio: 'inherit'
     }
   )
 
   await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
-    stdio: 'inherit',
-    cwd
+    cwd,
+    stdio: 'inherit'
   })
 
   if (typeof pathDirectoryTemporary === 'string') {

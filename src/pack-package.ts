@@ -6,7 +6,7 @@ import { mkdtemp, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { isNativeError } from 'node:util/types'
-import process from 'process'
+import process from 'node:process'
 import semver from 'semver'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryPackage } from './utilities/get-path-directory-package'
@@ -104,8 +104,8 @@ export async function packPackage() {
         { overwrite: true }
       )
     }
-  } catch (e) {
-    error = isNativeError(e) ? e : new Error('Unknown Error')
+  } catch (error_) {
+    error = isNativeError(error_) ? error_ : new Error('Unknown Error')
   }
 
   if (cleanup) {

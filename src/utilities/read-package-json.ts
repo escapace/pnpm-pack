@@ -1,7 +1,7 @@
-import path from 'path'
+import path from 'node:path'
 import fse from 'fs-extra'
-import assert from 'assert'
-import { readFile } from 'fs/promises'
+import assert from 'node:assert'
+import { readFile } from 'node:fs/promises'
 
 export async function readPackageJSON(directory: string) {
   const pathPackageJSON = path.join(directory, 'package.json')

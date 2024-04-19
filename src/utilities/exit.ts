@@ -1,4 +1,4 @@
-import { isNativeError } from 'util/types'
+import { isNativeError } from 'node:util/types'
 
 export function exit(error: unknown) {
   if (error !== undefined) {

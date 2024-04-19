@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import { findUp } from 'find-up'
-import path from 'path'
+import path from 'node:path'
 
 export async function getPathDirectoryPackage(cwd: string) {
   assert(typeof cwd === 'string')

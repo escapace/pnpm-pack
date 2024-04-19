@@ -1,5 +1,5 @@
 import arg from 'arg'
-import assert from 'assert'
+import assert from 'node:assert'
 import { assertRequirements } from './utilities/assert-requirements'
 import { exit } from './utilities/exit'
 
@@ -15,9 +15,9 @@ assert(
 
 // prettier-ignore
 const run = await ({
-  workspace: async () => (await import('./pack-workspace')).packWorkspace,
+  cleanup: async () => (await import('./pack-cleanup')).packCleanup,
   package: async () => (await import('./pack-package')).packPackage,
-  cleanup: async () => (await import('./pack-cleanup')).packCleanup
+  workspace: async () => (await import('./pack-workspace')).packWorkspace
 }[command]())
 
 const error = await run()

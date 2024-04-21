@@ -9,6 +9,7 @@ export async function getPathDirectoryWorkspace(cwd: string) {
     type: 'file'
   })
 
-  assert(typeof pathFileWorkspaceYaml === 'string')
-  return path.dirname(pathFileWorkspaceYaml)
+  return pathFileWorkspaceYaml === undefined
+    ? undefined
+    : path.dirname(pathFileWorkspaceYaml)
 }

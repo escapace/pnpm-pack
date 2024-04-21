@@ -5,8 +5,8 @@ import assert from 'node:assert'
 import { mkdtemp, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { isNativeError } from 'node:util/types'
 import process from 'node:process'
+import { isNativeError } from 'node:util/types'
 import semver from 'semver'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryPackage } from './utilities/get-path-directory-package'
@@ -20,6 +20,7 @@ export async function packPackage() {
   const options = arg({
     '--no-cleanup': Boolean,
     '--pack-destination': String,
+    '--skip-workspace-root': Boolean,
     '--temporary-directory': String,
     '--version': String
   })
@@ -28,7 +29,8 @@ export async function packPackage() {
 
   const pathDirectoryPackage = await getPathDirectoryPackage(process.cwd())
   const pathDirectoryRoot =
-    await getPathDirectoryWorkspace(pathDirectoryPackage)
+    (await getPathDirectoryWorkspace(pathDirectoryPackage)) ??
+    pathDirectoryPackage
 
   process.chdir(pathDirectoryPackage)
 
@@ -94,7 +96,7 @@ export async function packPackage() {
       }
     )
 
-    if (isRoot) {
+    if (isRoot && options['--skip-workspace-root'] === true) {
       await fse.remove(pathFileArchive)
     } else {
       await fse.mkdirp(pathDirectoryPackageContext)

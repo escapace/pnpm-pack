@@ -22,6 +22,9 @@ export async function packWorkspace() {
   let pathDirectoryTemporary: string | undefined
 
   const cwd = await getPathDirectoryWorkspace(process.cwd())
+
+  assert.ok(cwd !== undefined)
+
   process.chdir(cwd)
 
   // https://pnpm.io/filtering
@@ -86,6 +89,7 @@ export async function packWorkspace() {
       [
         ...pnpmExecArguments,
         'package',
+        '--skip-workspace-root',
         '--no-cleanup',
         '--temporary-directory',
         pathDirectoryTemporary,

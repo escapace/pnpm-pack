@@ -18,31 +18,29 @@ export async function packPackage() {
   let pathDirectoryTemporary: string | undefined
 
   const options = arg({
+    '--no-build': Boolean,
     '--no-cleanup': Boolean,
     '--pack-destination': String,
     '--skip-workspace-root': Boolean,
     '--temporary-directory': String,
-    '--version': String
+    '--version': String,
   })
 
-  const cleanup = options['--no-cleanup'] !== true
+  const flagCleanup = options['--no-cleanup'] !== true
+  const flagBuild = options['--no-build'] !== true
 
   const pathDirectoryPackage = await getPathDirectoryPackage(process.cwd())
   const pathDirectoryRoot =
-    (await getPathDirectoryWorkspace(pathDirectoryPackage)) ??
-    pathDirectoryPackage
+    (await getPathDirectoryWorkspace(pathDirectoryPackage)) ?? pathDirectoryPackage
 
   process.chdir(pathDirectoryPackage)
 
   const pathDirectoryDestination = path.resolve(
     pathDirectoryPackage,
-    options['--pack-destination'] ?? 'lib'
+    options['--pack-destination'] ?? 'lib',
   )
 
-  const pathDirectoryPackageRelative = path.relative(
-    pathDirectoryRoot,
-    pathDirectoryPackage
-  )
+  const pathDirectoryPackageRelative = path.relative(pathDirectoryRoot, pathDirectoryPackage)
 
   const isRoot = pathDirectoryPackageRelative === ''
   const pathPackageJSON = path.join(pathDirectoryPackage, 'package.json')
@@ -52,12 +50,15 @@ export async function packPackage() {
 
   assert(typeof semver.valid(version) === 'string')
 
-  await writeFile(
-    pathPackageJSON,
-    JSON.stringify(Object.assign(packageJSON, { version }), null, 2)
-  )
+  await writeFile(pathPackageJSON, JSON.stringify(Object.assign(packageJSON, { version }), null, 2))
 
   try {
+    if (typeof packageJSON.scripts?.build === 'string' && flagBuild) {
+      await execa('pnpm', ['run', 'build'], {
+        stdio: 'inherit',
+      })
+    }
+
     pathDirectoryTemporary =
       typeof options['--temporary-directory'] === 'string'
         ? path.resolve(pathDirectoryPackage, options['--temporary-directory'])
@@ -69,51 +70,39 @@ export async function packPackage() {
     const nameArchive = getNameArchive({ name: packageJSON.name, version })
     const pathFileArchive = path.join(pathDirectoryTemporary, nameArchive)
 
-    await execa(
-      'pnpm',
-      ['pack', '--pack-destination', pathDirectoryTemporary],
-      {
-        stdio: 'inherit'
-      }
-    )
+    await execa('pnpm', ['pack', '--pack-destination', pathDirectoryTemporary], {
+      stdio: 'inherit',
+    })
     assert(fse.exists(pathFileArchive))
     const pathDirectoryPackageContext = path.join(
       pathDirectoryContext,
-      pathDirectoryPackageRelative
+      pathDirectoryPackageRelative,
     )
     await fse.mkdirp(pathDirectoryPackageContext)
     await execa(
       'tar',
-      [
-        '-xf',
-        pathFileArchive,
-        '--strip-components=1',
-        '-C',
-        pathDirectoryPackageContext
-      ],
+      ['-xf', pathFileArchive, '--strip-components=1', '-C', pathDirectoryPackageContext],
       {
-        stdio: 'inherit'
-      }
+        stdio: 'inherit',
+      },
     )
 
     if (isRoot && options['--skip-workspace-root'] === true) {
       await fse.remove(pathFileArchive)
     } else {
       await fse.mkdirp(pathDirectoryPackageContext)
-      await fse.move(
-        pathFileArchive,
-        path.join(pathDirectoryDestination, nameArchive),
-        { overwrite: true }
-      )
+      await fse.move(pathFileArchive, path.join(pathDirectoryDestination, nameArchive), {
+        overwrite: true,
+      })
     }
   } catch (error_) {
     error = isNativeError(error_) ? error_ : new Error('Unknown Error')
   }
 
-  if (cleanup) {
+  if (flagCleanup) {
     await writeFile(
       pathPackageJSON,
-      JSON.stringify(Object.assign(packageJSON, { version: '0.0.0' }), null, 2)
+      JSON.stringify(Object.assign(packageJSON, { version: '0.0.0' }), null, 2),
     )
 
     if (typeof pathDirectoryTemporary === 'string') {

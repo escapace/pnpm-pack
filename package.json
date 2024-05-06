@@ -7,7 +7,7 @@
     "email": "opensource@escapace.com"
   },
   "bin": {
-    "pnpm-pack": "./lib/esm/index.mjs"
+    "pnpm-pack": "./lib/node/cli.js"
   },
   "bugs": "https://github.com/escapace/pnpm-pack/issues",
   "dependencies": {
@@ -27,17 +27,19 @@
     "@ls-lint/ls-lint": "2.2.3",
     "@types/fs-extra": "11.0.4",
     "@types/lodash-es": "4.17.12",
+    "@types/node": "20.12.8",
     "@types/semver": "7.5.8",
     "@types/which": "3.0.3",
     "@vitest/coverage-v8": "1.5.2",
     "eslint": "9.1.1",
-    "eslint-config-escapace": "5.0.5",
+    "eslint-config-escapace": "5.0.9",
+    "esroll": "0.1.0",
     "knip": "5.11.0",
     "lefthook": "1.6.10",
     "prettier": "3.2.5",
     "prettier-config-escapace": "1.2.0",
     "syncpack": "12.3.2",
-    "tsup": "8.0.2",
+    "tsx": "4.9.3",
     "typescript": "5.4.5",
     "vitest": "1.5.2"
   },
@@ -48,16 +50,16 @@
   "exports": {
     ".": {
       "types": "./lib/types/index.d.ts",
-      "import": "./lib/esm/index.mjs"
+      "import": "./lib/node/index.js"
     }
   },
   "files": [
-    "lib/esm",
+    "lib/node",
     "lib/types"
   ],
-  "homepage": "https://github.com/escapace/pnpm-pack",
+  "homepage": "https://github.com/escapace/pnpm-pack#readme",
   "license": "MPL-2.0",
-  "module": "lib/esm/index.mjs",
+  "module": "./lib/node/index.js",
   "private": false,
   "publishConfig": {
     "access": "public",
@@ -65,7 +67,7 @@
   },
   "repository": "escapace/pnpm-pack",
   "scripts": {
-    "build": "tsup",
+    "build": "tsx scripts/build.ts",
     "lint": "ls-lint --config .ls-lint.yaml && knip && eslint",
     "pack": "pnpm-pack package --pack-destination lib",
     "prepare": "lefthook install",
@@ -74,5 +76,5 @@
   },
   "sideEffects": false,
   "type": "module",
-  "types": "lib/types/index.d.ts"
+  "types": "./lib/types/index.d.ts"
 }

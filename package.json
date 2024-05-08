@@ -23,7 +23,6 @@
   "devDependencies": {
     "@commitlint/cli": "19.3.0",
     "@commitlint/config-conventional": "19.2.2",
-    "@escapace/pnpm-pack": "link:",
     "@ls-lint/ls-lint": "2.2.3",
     "@types/fs-extra": "11.0.4",
     "@types/lodash-es": "4.17.12",

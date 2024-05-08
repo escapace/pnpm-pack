@@ -157,7 +157,7 @@ export async function packPackage() {
   if (options.cleanup) {
     await writeFile(
       pathPackageJSON,
-      JSON.stringify(Object.assign(packageJSON, { version: '0.0.0' }), null, 2),
+      JSON.stringify(Object.assign(packageJSON, { version: '0.0.0' }), null, 2).concat('\n'),
     )
 
     if (typeof pathDirectoryTemporary === 'string') {

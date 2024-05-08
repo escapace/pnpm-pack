@@ -14,7 +14,7 @@ export async function packCleanup() {
 
   await writeFile(
     pathPackageJSON,
-    JSON.stringify(Object.assign(packageJSON, { version: '0.0.0' }), null, 2)
+    JSON.stringify(Object.assign(packageJSON, { version: '0.0.0' }), null, 2).concat('\n'),
   )
 
   return

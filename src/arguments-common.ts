@@ -17,7 +17,7 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
   const build = options['--no-build'] !== true
 
   const development = options['--development'] === true
-  const optional = options['--no-optional'] !== true
+  const noOptional = options['--no-optional'] === true
   const production = options['--production'] === true
 
   const deployment = development || production
@@ -28,7 +28,7 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
     build,
     deployment,
     development,
-    optional,
+    noOptional,
     packDestination,
     production,
     version,

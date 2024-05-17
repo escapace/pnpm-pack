@@ -83,7 +83,7 @@ export async function packWorkspace() {
         ...pnpmExecArguments,
         'package',
         options.development ? '--development' : undefined,
-        options.optional ? undefined : '--no-optional',
+        options.noOptional ? '--no-optional' : undefined,
         options.production ? '--production' : undefined,
         '--skip-workspace-root',
         '--no-cleanup',

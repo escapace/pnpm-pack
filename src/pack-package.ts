@@ -101,7 +101,7 @@ export async function packPackage() {
           'deploy',
           ...[
             options.development ? '--dev' : undefined,
-            options.optional ? undefined : '--no-optional',
+            options.noOptional ? '--no-optional' : undefined,
             options.production ? '--prod' : undefined,
           ].filter((value): value is string => typeof value === 'string'),
           '--filter',

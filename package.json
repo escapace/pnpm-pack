@@ -31,7 +31,7 @@
     "@types/which": "3.0.3",
     "@vitest/coverage-v8": "1.6.0",
     "eslint": "9.2.0",
-    "eslint-config-escapace": "5.0.10",
+    "eslint-config-escapace": "5.0.12",
     "esroll": "0.1.1",
     "knip": "5.13.0",
     "lefthook": "1.6.10",
@@ -67,6 +67,7 @@
   "repository": "escapace/pnpm-pack",
   "scripts": {
     "build": "tsx scripts/build.ts",
+    "format": "eslint --no-warn-ignored --fix && prettier -uw .",
     "lint": "ls-lint --config .ls-lint.yaml && knip && eslint",
     "pack": "node lib/node/cli.js package --pack-destination lib",
     "prepare": "lefthook install",

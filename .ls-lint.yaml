@@ -6,8 +6,9 @@ ls:
   .ts: kebab-case
 
 ignore:
-  - coverage
   - .git
   - .github
+  - coverage
   - lib
   - node_modules
+  - packages

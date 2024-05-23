@@ -108,7 +108,7 @@ export async function packWorkspace() {
       stdio: 'inherit',
     })
 
-    const { lockfile } = await readWantedLockfileAndAutofixConflicts(directoryPathContext, {
+    const { lockfile } = await readWantedLockfileAndAutofixConflicts(cwd, {
       ignoreIncompatible: false,
     })
 

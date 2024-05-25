@@ -12,6 +12,7 @@ import { argumentsCommon, argumentsCommonParse } from './arguments-common'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
 import { readPackageJSON } from './utilities/read-package-json'
+import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
 
 export async function packWorkspace() {
   let error: Error | undefined
@@ -40,10 +41,19 @@ export async function packWorkspace() {
     ...argumentsCommonParse(arguments_),
   }
 
-  const pathDirectoryDestination = path.resolve(cwd, options.packDestination)
-
   const packageJSON = await readPackageJSON(cwd)
-  const nameArchive = getNameArchive({ name: packageJSON.name, version: options.version })
+  const filenameArchiveDefault = getNameArchive({
+    name: packageJSON.name,
+    version: options.version,
+  })
+
+  const { pathDirectoryDestination, pathFileDestinationArchive } =
+    normalizePathDirectoryDestination({
+      extract: options.extract,
+      filenameArchiveDefault,
+      packDestination: options.packDestination,
+      pathDirectoryPackage: cwd,
+    })
 
   const filters = [
     ...(Array.isArray(arguments_['--filter-prod'])
@@ -85,6 +95,12 @@ export async function packWorkspace() {
         options.development ? '--development' : undefined,
         options.noOptional ? '--no-optional' : undefined,
         options.production ? '--production' : undefined,
+        options.extract ? '--extract' : undefined,
+        ...[
+          options.packDestination === undefined
+            ? []
+            : ['--pack-destination', options.packDestination],
+        ],
         '--skip-workspace-root',
         '--no-cleanup',
         '--temporary-directory',
@@ -98,10 +114,13 @@ export async function packWorkspace() {
       },
     )
 
-    const directoryPathContext = path.join(pathDirectoryTemporary, 'package')
-    const pathFileArchive = path.join(pathDirectoryTemporary, nameArchive)
+    const pathDirectoryTemporaryContext = path.join(pathDirectoryTemporary, 'package')
+    const pathFileTemporaryArchive = path.join(pathDirectoryTemporary, filenameArchiveDefault)
 
-    assert(await fse.exists(directoryPathContext), `${directoryPathContext}: No such directory`)
+    assert(
+      await fse.exists(pathDirectoryTemporaryContext),
+      `${pathDirectoryTemporaryContext}: No such directory`,
+    )
 
     await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
       cwd,
@@ -127,20 +146,37 @@ export async function packWorkspace() {
 
     lockfile.importers = importers
 
-    await writeWantedLockfile(directoryPathContext, lockfile)
+    await writeWantedLockfile(pathDirectoryTemporaryContext, lockfile)
 
-    await execa('tar', ['-czf', pathFileArchive, '-C', pathDirectoryTemporary, 'package'], {
-      cwd,
-      stdio: 'inherit',
-    })
+    await execa(
+      'tar',
+      ['-czf', pathFileTemporaryArchive, '-C', pathDirectoryTemporary, 'package'],
+      {
+        cwd,
+        stdio: 'inherit',
+      },
+    )
 
-    assert(await fse.exists(pathFileArchive), `${pathFileArchive}: No such file`)
+    assert(await fse.exists(pathFileTemporaryArchive), `${pathFileTemporaryArchive}: No such file`)
 
-    await fse.remove(directoryPathContext)
-    await fse.mkdirp(pathDirectoryDestination)
-    await fse.move(pathFileArchive, path.join(pathDirectoryDestination, nameArchive), {
-      overwrite: true,
-    })
+    await fse.remove(pathDirectoryTemporaryContext)
+
+    if (options.extract) {
+      await fse.emptydir(pathDirectoryDestination)
+
+      await execa(
+        'tar',
+        ['-xf', pathFileTemporaryArchive, '--strip-components=1', '-C', pathDirectoryDestination],
+        {
+          stdio: 'inherit',
+        },
+      )
+    } else {
+      await fse.mkdirp(pathDirectoryDestination)
+      await fse.move(pathFileTemporaryArchive, pathFileDestinationArchive, {
+        overwrite: true,
+      })
+    }
   } catch (error_) {
     error = isNativeError(error_) ? error_ : new Error('Unknown Error')
   }

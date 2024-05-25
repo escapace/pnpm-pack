@@ -13,40 +13,56 @@ import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryPackage } from './utilities/get-path-directory-package'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
 import { readPackageJSON } from './utilities/read-package-json'
+import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
 
 export async function packPackage() {
   let error: Error | undefined
   let pathDirectoryTemporary: string | undefined
 
   const arguments_ = arg({
-    '--extract': Boolean,
     '--no-cleanup': Boolean,
     '--skip-workspace-root': Boolean,
     '--temporary-directory': String,
     ...argumentsCommon,
   })
 
+  const pathDirectoryPackage = await getPathDirectoryPackage(process.cwd())
+
   const options = {
     ...argumentsCommonParse(arguments_),
     cleanup: arguments_['--no-cleanup'] !== true,
-    extract: arguments_['--extract'] === true,
     skipWorkspaceRoot: arguments_['--skip-workspace-root'] === true,
     temporaryDirectory: arguments_['--temporary-directory'],
   }
 
-  const pathDirectoryPackage = await getPathDirectoryPackage(process.cwd())
   const pathDirectoryRoot =
     (await getPathDirectoryWorkspace(pathDirectoryPackage)) ?? pathDirectoryPackage
 
   process.chdir(pathDirectoryPackage)
 
-  const pathDirectoryDestination = path.resolve(pathDirectoryPackage, options.packDestination)
+  // if (options.archivePath !== undefined) {
+  //   assert()
+  // }
 
-  const pathDirectoryPackageRelative = path.relative(pathDirectoryRoot, pathDirectoryPackage)
+  const pathRelativeDirectoryPackageR = path.relative(pathDirectoryRoot, pathDirectoryPackage)
 
-  const isRoot = pathDirectoryPackageRelative === ''
+  const isRoot = pathRelativeDirectoryPackageR === ''
   const pathPackageJSON = path.join(pathDirectoryPackage, 'package.json')
   const packageJSON = await readPackageJSON(pathDirectoryPackage)
+
+  // https://github.com/pnpm/pnpm/blob/6caec8109b563fd27ad262ce06a1f587cebbc044/releasing/plugin-commands-publishing/src/pack.ts#L98C1-L98C100
+  const filenameArchiveDefault = getNameArchive({
+    name: packageJSON.name,
+    version: options.version,
+  })
+
+  const { pathDirectoryDestination, pathFileDestinationArchive } =
+    normalizePathDirectoryDestination({
+      extract: options.extract,
+      filenameArchiveDefault,
+      packDestination: options.packDestination,
+      pathDirectoryPackage,
+    })
 
   await writeFile(
     pathPackageJSON,
@@ -65,25 +81,28 @@ export async function packPackage() {
         ? path.resolve(pathDirectoryPackage, options.temporaryDirectory)
         : await mkdtemp(path.join(os.tmpdir(), 'pnpm-pack'))
 
-    const pathDirectoryContext = path.join(pathDirectoryTemporary, 'package')
+    const pathDirectoryTemporaryContext = path.join(
+      path.join(pathDirectoryTemporary, 'package'),
+      pathRelativeDirectoryPackageR,
+    )
 
-    // https://github.com/pnpm/pnpm/blob/6caec8109b563fd27ad262ce06a1f587cebbc044/releasing/plugin-commands-publishing/src/pack.ts#L98C1-L98C100
-    const nameArchive = getNameArchive({ name: packageJSON.name, version: options.version })
-    const pathFileArchive = path.join(pathDirectoryTemporary, nameArchive)
+    const pathFileTemporaryArchive = path.join(pathDirectoryTemporary, filenameArchiveDefault)
 
     await execa('pnpm', ['pack', '--pack-destination', pathDirectoryTemporary], {
       stdio: 'inherit',
     })
-    assert(await fse.exists(pathFileArchive), `${pathFileArchive}: No such file`)
-    const pathDirectoryPackageContext = path.join(
-      pathDirectoryContext,
-      pathDirectoryPackageRelative,
-    )
-    await fse.mkdirp(pathDirectoryPackageContext)
+    assert(await fse.exists(pathFileTemporaryArchive), `${pathFileTemporaryArchive}: No such file`)
+    await fse.mkdirp(pathDirectoryTemporaryContext)
 
     await execa(
       'tar',
-      ['-xf', pathFileArchive, '--strip-components=1', '-C', pathDirectoryPackageContext],
+      [
+        '-xf',
+        pathFileTemporaryArchive,
+        '--strip-components=1',
+        '-C',
+        pathDirectoryTemporaryContext,
+      ],
       {
         stdio: 'inherit',
       },
@@ -92,7 +111,7 @@ export async function packPackage() {
     if (options.deployment) {
       const pathDirectoryDeployment = path.join(
         pathDirectoryTemporary,
-        kebabCase(`${nameArchive}-deployment`),
+        kebabCase(`${filenameArchiveDefault}-deployment`),
       )
 
       await execa(
@@ -116,12 +135,19 @@ export async function packPackage() {
       const pathNodeModules = path.join(pathDirectoryDeployment, 'node_modules')
 
       if (await fse.exists(pathNodeModules)) {
-        await fse.move(pathNodeModules, path.join(pathDirectoryPackageContext, 'node_modules'))
+        await fse.move(pathNodeModules, path.join(pathDirectoryTemporaryContext, 'node_modules'))
       }
 
       await execa(
         'tar',
-        ['-czf', pathFileArchive, '--strip-components=1', '-C', pathDirectoryTemporary, 'package'],
+        [
+          '-czf',
+          pathFileTemporaryArchive,
+          '--strip-components=1',
+          '-C',
+          pathDirectoryTemporary,
+          'package',
+        ],
         {
           stdio: 'inherit',
         },
@@ -129,21 +155,22 @@ export async function packPackage() {
     }
 
     if (isRoot && options.skipWorkspaceRoot) {
-      await fse.remove(pathFileArchive)
+      await fse.remove(pathFileTemporaryArchive)
     } else {
-      await fse.mkdirp(pathDirectoryPackageContext)
+      // await fse.mkdirp(pathDirectoryPackageContext)
       if (options.extract) {
         await fse.emptydir(pathDirectoryDestination)
 
         await execa(
           'tar',
-          ['-xf', pathFileArchive, '--strip-components=1', '-C', pathDirectoryDestination],
+          ['-xf', pathFileTemporaryArchive, '--strip-components=1', '-C', pathDirectoryDestination],
           {
             stdio: 'inherit',
           },
         )
       } else {
-        await fse.move(pathFileArchive, path.join(pathDirectoryDestination, nameArchive), {
+        await fse.mkdirp(pathDirectoryDestination)
+        await fse.move(pathFileTemporaryArchive, pathFileDestinationArchive, {
           overwrite: true,
         })
       }

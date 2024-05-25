@@ -15,7 +15,7 @@ assert(command === 'workspace' || command === 'package' || command === 'cleanup'
 const run = await ({
   cleanup: async () => (await import('./pack-cleanup')).packCleanup,
   package: async () => (await import('./pack-package')).packPackage,
-  workspace: async () => (await import('./pack-workspace')).packWorkspace
+  workspace: async () => (await import('./pack-workspace')).packWorkspace,
 }[command]())
 
 const error = await run()

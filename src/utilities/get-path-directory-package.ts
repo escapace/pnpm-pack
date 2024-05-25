@@ -6,7 +6,7 @@ export async function getPathDirectoryPackage(cwd: string) {
   assert(typeof cwd === 'string')
   const pathFilePackageJSON = await findUp('package.json', {
     cwd,
-    type: 'file'
+    type: 'file',
   })
 
   assert(typeof pathFilePackageJSON === 'string')

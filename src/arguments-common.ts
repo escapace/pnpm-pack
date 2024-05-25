@@ -4,6 +4,7 @@ import semver from 'semver'
 
 export const argumentsCommon = {
   '--development': Boolean,
+  '--extract': Boolean,
   '--no-build': Boolean,
   '--no-optional': Boolean,
   '--pack-destination': String,
@@ -22,12 +23,14 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
 
   const deployment = development || production
 
-  const packDestination = options['--pack-destination'] ?? 'lib'
+  const extract = options['--extract'] === true
+  const packDestination = options['--pack-destination'] ?? (extract ? 'lib/package' : 'lib')
 
   return {
     build,
     deployment,
     development,
+    extract,
     noOptional,
     packDestination,
     production,

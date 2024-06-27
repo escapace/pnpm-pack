@@ -11,18 +11,20 @@ import { isNativeError } from 'node:util/types'
 import { argumentsCommon, argumentsCommonParse } from './arguments-common'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
-import { readPackageJSON } from './utilities/read-package-json'
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
+import { readPackageJSON } from './utilities/read-package-json'
 
 export async function packWorkspace() {
   let error: Error | undefined
   let pathDirectoryTemporary: string | undefined
 
-  const cwd = await getPathDirectoryWorkspace(process.cwd())
+  const pathDirectoryCurrent = process.cwd()
 
-  assert.ok(cwd !== undefined)
+  const pathDirectoryWorkspace = await getPathDirectoryWorkspace(pathDirectoryCurrent)
 
-  process.chdir(cwd)
+  assert.ok(pathDirectoryWorkspace !== undefined)
+
+  process.chdir(pathDirectoryWorkspace)
 
   // https://pnpm.io/filtering
   const arguments_ = arg(
@@ -41,7 +43,7 @@ export async function packWorkspace() {
     ...argumentsCommonParse(arguments_),
   }
 
-  const packageJSON = await readPackageJSON(cwd)
+  const packageJSON = await readPackageJSON(pathDirectoryWorkspace)
   const filenameArchiveDefault = getNameArchive({
     name: packageJSON.name,
     version: options.version,
@@ -52,7 +54,7 @@ export async function packWorkspace() {
       extract: options.extract,
       filenameArchiveDefault,
       packDestination: options.packDestination,
-      pathDirectoryPackage: cwd,
+      pathDirectoryCurrent,
     })
 
   const filters = [
@@ -109,7 +111,7 @@ export async function packWorkspace() {
         options.version,
       ].filter((value): value is string => typeof value === 'string'),
       {
-        cwd,
+        cwd: pathDirectoryWorkspace,
         stdio: 'inherit',
       },
     )
@@ -123,11 +125,11 @@ export async function packWorkspace() {
     )
 
     await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
-      cwd,
+      cwd: pathDirectoryWorkspace,
       stdio: 'inherit',
     })
 
-    const { lockfile } = await readWantedLockfileAndAutofixConflicts(cwd, {
+    const { lockfile } = await readWantedLockfileAndAutofixConflicts(pathDirectoryWorkspace, {
       ignoreIncompatible: false,
     })
 
@@ -152,7 +154,7 @@ export async function packWorkspace() {
       'tar',
       ['-czf', pathFileTemporaryArchive, '-C', pathDirectoryTemporary, 'package'],
       {
-        cwd,
+        cwd: pathDirectoryWorkspace,
         stdio: 'inherit',
       },
     )
@@ -185,13 +187,13 @@ export async function packWorkspace() {
     'pnpm',
     [...pnpmExecArguments, 'cleanup'].filter((value): value is string => typeof value === 'string'),
     {
-      cwd,
+      cwd: pathDirectoryWorkspace,
       stdio: 'inherit',
     },
   )
 
   await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
-    cwd,
+    cwd: pathDirectoryWorkspace,
     stdio: 'inherit',
   })
 

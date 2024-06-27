@@ -3,7 +3,7 @@ import { execa } from 'execa'
 import fse from 'fs-extra'
 import { kebabCase } from 'lodash-es'
 import assert from 'node:assert'
-import { mkdtemp, writeFile } from 'node:fs/promises'
+import { mkdtemp } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
@@ -14,6 +14,7 @@ import { getPathDirectoryPackage } from './utilities/get-path-directory-package'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
 import { readPackageJSON } from './utilities/read-package-json'
+import { writeFileJSON } from './utilities/write-file-json'
 
 export async function packPackage() {
   let error: Error | undefined
@@ -41,10 +42,6 @@ export async function packPackage() {
 
   process.chdir(pathDirectoryPackage)
 
-  // if (options.archivePath !== undefined) {
-  //   assert()
-  // }
-
   const pathRelativeDirectoryPackageR = path.relative(pathDirectoryRoot, pathDirectoryPackage)
 
   const isRoot = pathRelativeDirectoryPackageR === ''
@@ -65,13 +62,14 @@ export async function packPackage() {
       pathDirectoryCurrent,
     })
 
-  await writeFile(
-    pathPackageJSON,
-    JSON.stringify(Object.assign(packageJSON, { version: options.version }), null, 2),
-  )
+  await writeFileJSON(pathPackageJSON, Object.assign(packageJSON, { version: options.version }))
 
   try {
-    if (typeof packageJSON.scripts?.build === 'string' && options.build) {
+    if (
+      typeof packageJSON.scripts?.build === 'string' &&
+      options.build &&
+      !(isRoot && options.skipWorkspaceRoot)
+    ) {
       await execa('pnpm', ['run', 'build'], {
         stdio: 'inherit',
       })
@@ -183,10 +181,7 @@ export async function packPackage() {
   }
 
   if (options.cleanup) {
-    await writeFile(
-      pathPackageJSON,
-      JSON.stringify(Object.assign(packageJSON, { version: '0.0.0' }), null, 2).concat('\n'),
-    )
+    await writeFileJSON(pathPackageJSON, Object.assign(packageJSON, { version: '0.0.0' }))
 
     if (typeof pathDirectoryTemporary === 'string') {
       await fse.remove(pathDirectoryTemporary)

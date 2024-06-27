@@ -91,9 +91,26 @@ export async function packWorkspace() {
 
     await execa(
       'pnpm',
+      [...pnpmExecArguments, 'update-version', '--version', options.version].filter(
+        (value): value is string => typeof value === 'string',
+      ),
+      {
+        cwd: pathDirectoryWorkspace,
+        stdio: 'inherit',
+      },
+    )
+
+    await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
+      cwd: pathDirectoryWorkspace,
+      stdio: 'inherit',
+    })
+
+    await execa(
+      'pnpm',
       [
         ...pnpmExecArguments,
         'package',
+        options.build ? undefined : '--no-build',
         options.development ? '--development' : undefined,
         options.noOptional ? '--no-optional' : undefined,
         options.production ? '--production' : undefined,
@@ -123,11 +140,6 @@ export async function packWorkspace() {
       await fse.exists(pathDirectoryTemporaryContext),
       `${pathDirectoryTemporaryContext}: No such directory`,
     )
-
-    await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
-      cwd: pathDirectoryWorkspace,
-      stdio: 'inherit',
-    })
 
     const { lockfile } = await readWantedLockfileAndAutofixConflicts(pathDirectoryWorkspace, {
       ignoreIncompatible: false,

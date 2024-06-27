@@ -12,8 +12,8 @@ import { argumentsCommon, argumentsCommonParse } from './arguments-common'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryPackage } from './utilities/get-path-directory-package'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
-import { readPackageJSON } from './utilities/read-package-json'
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
+import { readPackageJSON } from './utilities/read-package-json'
 
 export async function packPackage() {
   let error: Error | undefined
@@ -26,7 +26,8 @@ export async function packPackage() {
     ...argumentsCommon,
   })
 
-  const pathDirectoryPackage = await getPathDirectoryPackage(process.cwd())
+  const pathDirectoryCurrent = process.cwd()
+  const pathDirectoryPackage = await getPathDirectoryPackage(pathDirectoryCurrent)
 
   const options = {
     ...argumentsCommonParse(arguments_),
@@ -61,7 +62,7 @@ export async function packPackage() {
       extract: options.extract,
       filenameArchiveDefault,
       packDestination: options.packDestination,
-      pathDirectoryPackage,
+      pathDirectoryCurrent,
     })
 
   await writeFile(

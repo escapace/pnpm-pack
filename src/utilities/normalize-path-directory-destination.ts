@@ -5,7 +5,7 @@ export const normalizePathDirectoryDestination = (options: {
   extract: boolean
   filenameArchiveDefault: string
   packDestination: string
-  pathDirectoryPackage: string
+  pathDirectoryCurrent: string
 }) => {
   assert(!path.isAbsolute(options.packDestination))
 
@@ -16,8 +16,8 @@ export const normalizePathDirectoryDestination = (options: {
   assert(!(pathDirectoryDestinationIsArchive && options.extract))
 
   const pathDirectoryDestination = pathDirectoryDestinationIsArchive
-    ? path.resolve(options.pathDirectoryPackage, path.dirname(options.packDestination))
-    : path.resolve(options.pathDirectoryPackage, options.packDestination)
+    ? path.resolve(options.pathDirectoryCurrent, path.dirname(options.packDestination))
+    : path.resolve(options.pathDirectoryCurrent, options.packDestination)
 
   const pathFileDestinationArchive = pathDirectoryDestinationIsArchive
     ? path.join(pathDirectoryDestination, path.basename(options.packDestination))

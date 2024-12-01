@@ -9,8 +9,8 @@ const dirname = path.resolve(import.meta.dirname, '../')
 process.chdir(dirname)
 
 const packageJSON = JSON.parse(await readFile(path.join(dirname, 'package.json'), 'utf-8')) as {
-  dependencies?: Record<string, string>
   version: string
+  dependencies?: Record<string, string>
 }
 
 const constants = JSON.parse(

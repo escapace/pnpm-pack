@@ -7,7 +7,7 @@ export async function readPackageJSON(
   directory: string,
 ): Promise<{ name: string; scripts?: { build?: string }; version?: string }> {
   const pathPackageJSON = path.join(directory, 'package.json')
-  assert(fse.exists(pathPackageJSON))
+  assert(await fse.exists(pathPackageJSON))
   const content = await readFile(pathPackageJSON, 'utf8')
   assert(typeof content === 'string')
   const packageJSON = JSON.parse(content) as { name: string }

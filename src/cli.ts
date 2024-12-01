@@ -7,7 +7,7 @@ await assertRequirements()
 
 const { _ } = arg({}, { permissive: true })
 
-assert((_.length = 1))
+assert(_.length > 0, `Either of 'workspace' or 'package' sub-command is required.`)
 const command = _[0]
 assert(
   command === 'workspace' ||

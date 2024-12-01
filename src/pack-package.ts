@@ -96,7 +96,7 @@ export async function packPackage() {
     await execa(
       'tar',
       [
-        '-xf',
+        '-xzf',
         pathFileTemporaryArchive,
         '--strip-components=1',
         '-C',
@@ -162,7 +162,13 @@ export async function packPackage() {
 
         await execa(
           'tar',
-          ['-xf', pathFileTemporaryArchive, '--strip-components=1', '-C', pathDirectoryDestination],
+          [
+            '-xzf',
+            pathFileTemporaryArchive,
+            '--strip-components=1',
+            '-C',
+            pathDirectoryDestination,
+          ],
           {
             stdio: 'inherit',
           },

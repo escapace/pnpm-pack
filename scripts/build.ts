@@ -11,6 +11,7 @@ process.chdir(dirname)
 const packageJSON = JSON.parse(await readFile(path.join(dirname, 'package.json'), 'utf-8')) as {
   version: string
   dependencies?: Record<string, string>
+  peerDependencies?: Record<string, string>
 }
 
 const constants = JSON.parse(
@@ -22,7 +23,10 @@ const constants = JSON.parse(
 for (const value of Object.values(constants.builds)) {
   await build({
     absWorkingDir: dirname,
-    external: Object.keys(packageJSON.dependencies ?? []),
+    external: [
+      ...Object.keys(packageJSON.dependencies ?? []),
+      ...Object.keys(packageJSON.peerDependencies ?? []),
+    ],
     sourcemap: true,
     sourcesContent: false,
     splitting: true,

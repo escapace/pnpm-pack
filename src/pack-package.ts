@@ -15,10 +15,13 @@ import { getPathDirectoryWorkspace } from './utilities/get-path-directory-worksp
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
 import { readPackageJSON } from './utilities/read-package-json'
 import { writeFileJSON } from './utilities/write-file-json'
+import { pnpmVersion as _pnpmVersion } from './utilities/pnpm-version'
 
 export async function packPackage() {
   let error: Error | undefined
   let pathDirectoryTemporary: string | undefined
+
+  const pnpmVersion = await _pnpmVersion()
 
   const arguments_ = arg({
     '--no-cleanup': Boolean,
@@ -117,15 +120,16 @@ export async function packPackage() {
         'pnpm',
         [
           'deploy',
+          pnpmVersion.major >= 10 ? '--legacy' : undefined,
           ...[
             options.development ? '--dev' : undefined,
             options.noOptional ? '--no-optional' : undefined,
             options.production ? '--prod' : undefined,
-          ].filter((value): value is string => typeof value === 'string'),
+          ],
           '--filter',
           '.',
           pathDirectoryDeployment,
-        ],
+        ].filter((value): value is string => typeof value === 'string'),
         {
           stdio: 'inherit',
         },

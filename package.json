@@ -18,7 +18,7 @@
     "fs-extra": "^11.3.0",
     "lodash-es": "^4.17.21",
     "semver": "^7.7.2",
-    "which": "^5.0.0"
+    "which": "^6.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "19.8.1",

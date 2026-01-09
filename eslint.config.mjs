@@ -1,4 +1,8 @@
 // @ts-check
-import { escapace } from 'eslint-config-escapace'
+import { escapace, compose } from 'eslint-config-escapace'
 
-export default escapace()
+export default compose(escapace(), {
+  rules: {
+    'depend/ban-dependencies': ['error', { allowed: ['fs-extra', 'find-up', 'execa'] }],
+  },
+})

@@ -2,7 +2,7 @@ import { readWantedLockfileAndAutofixConflicts, writeWantedLockfile } from '@pnp
 import arg from 'arg'
 import { execa } from 'execa'
 import fse from 'fs-extra'
-import { mapValues } from 'lodash-es'
+import { mapValues } from 'es-toolkit/compat'
 import assert from 'node:assert'
 import { mkdtemp } from 'node:fs/promises'
 import os from 'node:os'

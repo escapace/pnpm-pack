@@ -13,7 +13,7 @@ export const normalizePathDirectoryDestination = (options: {
     options.packDestination.endsWith(value),
   )
 
-  assert(!(pathDirectoryDestinationIsArchive && options.extract))
+  assert(!pathDirectoryDestinationIsArchive || !options.extract)
 
   const pathDirectoryDestination = pathDirectoryDestinationIsArchive
     ? path.resolve(options.pathDirectoryCurrent, path.dirname(options.packDestination))

@@ -1,7 +1,7 @@
 import arg from 'arg'
 import { execa } from 'execa'
 import fse from 'fs-extra'
-import { kebabCase } from 'lodash-es'
+import { kebabCase } from 'es-toolkit/compat'
 import assert from 'node:assert'
 import { mkdtemp } from 'node:fs/promises'
 import os from 'node:os'
@@ -71,7 +71,7 @@ export async function packPackage() {
     if (
       typeof packageJSON.scripts?.build === 'string' &&
       options.build &&
-      !(isRoot && options.skipWorkspaceRoot)
+      (!isRoot || !options.skipWorkspaceRoot)
     ) {
       await execa('pnpm', ['run', 'build'], {
         stdio: 'inherit',

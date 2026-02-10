@@ -1,25 +1,70 @@
 import arg from 'arg'
-import assert from 'node:assert'
 import { assertRequirements } from './utilities/assert-requirements'
 import { exit } from './utilities/exit'
+
+const helpMessage = [
+  'pnpm-pack',
+  '',
+  'Package pnpm projects and workspaces into a .tgz archive by default,',
+  'or extract package files to a directory with --extract.',
+  '',
+  'Usage:',
+  '  pnpm-pack <command> [options]',
+  '  pnpm-pack --help',
+  '  pnpm-pack -h',
+  '',
+  'Commands:',
+  '  package    Package the nearest project (nearest package.json).',
+  '  workspace  Package workspace packages from nearest pnpm-workspace.yaml.',
+  '',
+  'Common options:',
+  '  --version <semver>         Set package version for packaging and archive names.',
+  '  --pack-destination <path>  Set output destination (relative path only).',
+  '  --extract                  Extract package files to a directory instead of .tgz.',
+  '  --no-build                 Skip running build scripts.',
+  '  --production               Include production dependencies in the artifact.',
+  '  --development              Include development dependencies in the artifact.',
+  '  --no-optional              Omit optional dependencies with deployment options.',
+  '  --silent                   Suppress output from child commands.',
+  '',
+  'Workspace selection options:',
+  '  --filter <selector>                    pnpm filter selector (repeatable).',
+  '  --filter-prod <selector>               pnpm production filter selector (repeatable).',
+  '  --test-pattern <glob>                  Forwarded to pnpm filtering.',
+  '  --changed-files-ignore-pattern <glob>  Forwarded to pnpm filtering.',
+  '  --workspace-concurrency <number>       Limit workspace command parallelism.',
+].join('\n')
+
+type Command = 'cleanup' | 'package' | 'update-version' | 'workspace'
+
+const commands = new Set<Command>(['cleanup', 'package', 'update-version', 'workspace'])
+
+const isCommand = (value: string): value is Command => commands.has(value as Command)
 
 let error: unknown
 
 try {
-  await assertRequirements()
+  const argv = process.argv.slice(2)
 
-  const { _ } = arg({}, { permissive: true })
+  if (argv.includes('--help') || argv.includes('-h')) {
+    console.log(helpMessage)
+    process.exit(0)
+  }
 
-  assert(_.length > 0, `Either of 'workspace' or 'package' sub-command is required.`)
-
+  const { _ } = arg({}, { argv, permissive: true })
   const command = _[0]
 
-  assert(
-    command === 'workspace' ||
-      command === 'package' ||
-      command === 'cleanup' ||
-      command === 'update-version',
-  )
+  if (typeof command !== 'string') {
+    console.log(helpMessage)
+    process.exit(0)
+  }
+
+  if (!isCommand(command)) {
+    console.log(helpMessage)
+    process.exit(1)
+  }
+
+  await assertRequirements()
 
   // prettier-ignore
   const run = await ({

@@ -1,6 +1,6 @@
 # pnpm-pack
 
-`pnpm-pack` packages pnpm projects and pnpm workspaces into a gzip-compressed tarball (`.tgz`) by default, or into an extracted directory when `--extract` is used.
+`pnpm-pack` packages pnpm projects and workspaces into a gzip-compressed tarball (`.tgz`) by default, or extracts package files to a directory when `--extract` is used.
 
 Available commands:
 
@@ -20,7 +20,7 @@ By default, artifacts are written to `./lib`. With `--extract`, the destination 
 
 - `--version <semver>` sets the version used for packaging and for resulting artifact names.
 - `--pack-destination <path>` controls where artifacts are written.
-- `--extract` writes an extracted directory instead of a tarball.
+- `--extract` extracts package files to a directory instead of writing a tarball.
 - `--no-build` skips running `pnpm run build` before packaging.
 - `--production` and `--development` create an artifact that includes an isolated `node_modules` based on pnpm deploy behavior.
 - `--no-optional` omits optional dependencies when `--production` or `--development` is used.

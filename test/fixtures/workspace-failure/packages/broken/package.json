@@ -1,0 +1,12 @@
+{
+  "name": "@fixture/failure-broken",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "build": "node -e \"process.exit(1)\""
+  }
+}

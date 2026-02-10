@@ -1,0 +1,9 @@
+{
+  "name": "@fixture/filter-dev-lib",
+  "version": "8.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "index.js"
+  ]
+}

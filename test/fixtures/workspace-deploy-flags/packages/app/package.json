@@ -1,0 +1,18 @@
+{
+  "name": "@fixture/app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "@fixture/prod-dep": "workspace:*"
+  },
+  "devDependencies": {
+    "@fixture/dev-dep": "workspace:*"
+  },
+  "optionalDependencies": {
+    "@fixture/optional-dep": "workspace:*"
+  }
+}

@@ -13,6 +13,7 @@ import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
 import { readPackageJSON } from './utilities/read-package-json'
+import { getExecaStdio } from './utilities/get-execa-stdio'
 
 export async function packWorkspace() {
   let error: Error | undefined
@@ -42,6 +43,8 @@ export async function packWorkspace() {
   const options = {
     ...argumentsCommonParse(arguments_),
   }
+
+  const stdio = getExecaStdio(options.silent)
 
   const packageJSON = await readPackageJSON(pathDirectoryWorkspace)
   const filenameArchiveDefault = getNameArchive({
@@ -96,13 +99,13 @@ export async function packWorkspace() {
       ),
       {
         cwd: pathDirectoryWorkspace,
-        stdio: 'inherit',
+        stdio,
       },
     )
 
     await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
       cwd: pathDirectoryWorkspace,
-      stdio: 'inherit',
+      stdio,
     })
 
     await execa(
@@ -114,6 +117,7 @@ export async function packWorkspace() {
         options.development ? '--development' : undefined,
         options.noOptional ? '--no-optional' : undefined,
         options.production ? '--production' : undefined,
+        options.silent ? '--silent' : undefined,
         options.extract ? '--extract' : undefined,
         ...[
           options.packDestination === undefined
@@ -129,7 +133,7 @@ export async function packWorkspace() {
       ].filter((value): value is string => typeof value === 'string'),
       {
         cwd: pathDirectoryWorkspace,
-        stdio: 'inherit',
+        stdio,
       },
     )
 
@@ -167,7 +171,7 @@ export async function packWorkspace() {
       ['-czf', pathFileTemporaryArchive, '-C', pathDirectoryTemporary, 'package'],
       {
         cwd: pathDirectoryWorkspace,
-        stdio: 'inherit',
+        stdio,
       },
     )
 
@@ -182,7 +186,7 @@ export async function packWorkspace() {
         'tar',
         ['-xzf', pathFileTemporaryArchive, '--strip-components=1', '-C', pathDirectoryDestination],
         {
-          stdio: 'inherit',
+          stdio,
         },
       )
     } else {
@@ -200,13 +204,13 @@ export async function packWorkspace() {
     [...pnpmExecArguments, 'cleanup'].filter((value): value is string => typeof value === 'string'),
     {
       cwd: pathDirectoryWorkspace,
-      stdio: 'inherit',
+      stdio,
     },
   )
 
   await execa('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], {
     cwd: pathDirectoryWorkspace,
-    stdio: 'inherit',
+    stdio,
   })
 
   if (typeof pathDirectoryTemporary === 'string') {

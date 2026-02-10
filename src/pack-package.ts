@@ -16,6 +16,7 @@ import { normalizePathDirectoryDestination } from './utilities/normalize-path-di
 import { readPackageJSON } from './utilities/read-package-json'
 import { writeFileJSON } from './utilities/write-file-json'
 import { pnpmVersion as _pnpmVersion } from './utilities/pnpm-version'
+import { getExecaStdio } from './utilities/get-execa-stdio'
 
 export async function packPackage() {
   let error: Error | undefined
@@ -39,6 +40,8 @@ export async function packPackage() {
     skipWorkspaceRoot: arguments_['--skip-workspace-root'] === true,
     temporaryDirectory: arguments_['--temporary-directory'],
   }
+
+  const stdio = getExecaStdio(options.silent)
 
   const pathDirectoryRoot =
     (await getPathDirectoryWorkspace(pathDirectoryPackage)) ?? pathDirectoryPackage
@@ -74,7 +77,7 @@ export async function packPackage() {
       (!isRoot || !options.skipWorkspaceRoot)
     ) {
       await execa('pnpm', ['run', 'build'], {
-        stdio: 'inherit',
+        stdio,
       })
     }
 
@@ -91,7 +94,7 @@ export async function packPackage() {
     const pathFileTemporaryArchive = path.join(pathDirectoryTemporary, filenameArchiveDefault)
 
     await execa('pnpm', ['pack', '--pack-destination', pathDirectoryTemporary], {
-      stdio: 'inherit',
+      stdio,
     })
     assert(await fse.exists(pathFileTemporaryArchive), `${pathFileTemporaryArchive}: No such file`)
     await fse.mkdirp(pathDirectoryTemporaryContext)
@@ -106,7 +109,7 @@ export async function packPackage() {
         pathDirectoryTemporaryContext,
       ],
       {
-        stdio: 'inherit',
+        stdio,
       },
     )
 
@@ -131,7 +134,7 @@ export async function packPackage() {
           pathDirectoryDeployment,
         ].filter((value): value is string => typeof value === 'string'),
         {
-          stdio: 'inherit',
+          stdio,
         },
       )
 
@@ -152,7 +155,7 @@ export async function packPackage() {
           'package',
         ],
         {
-          stdio: 'inherit',
+          stdio,
         },
       )
     }
@@ -174,7 +177,7 @@ export async function packPackage() {
             pathDirectoryDestination,
           ],
           {
-            stdio: 'inherit',
+            stdio,
           },
         )
       } else {

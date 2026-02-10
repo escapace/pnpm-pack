@@ -1,0 +1,13 @@
+{
+  "name": "@fixture/buildable",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "index.js",
+    "built.txt"
+  ],
+  "scripts": {
+    "build": "node -e \"require('node:fs').writeFileSync('built.txt', 'built\\n')\""
+  }
+}

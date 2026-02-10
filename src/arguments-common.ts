@@ -9,6 +9,7 @@ export const argumentsCommon = {
   '--no-optional': Boolean,
   '--pack-destination': String,
   '--production': Boolean,
+  '--silent': Boolean,
   '--version': String,
 } as const
 
@@ -25,6 +26,7 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
 
   const extract = options['--extract'] === true
   const packDestination = options['--pack-destination'] ?? (extract ? 'lib/package' : 'lib')
+  const silent = options['--silent'] === true
 
   return {
     build,
@@ -34,6 +36,7 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
     noOptional,
     packDestination,
     production,
+    silent,
     version,
   }
 }

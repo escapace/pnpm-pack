@@ -1,0 +1,9 @@
+{
+  "name": "@fixture/filter-prod-lib",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "index.js"
+  ]
+}

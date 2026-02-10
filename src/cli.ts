@@ -3,26 +3,35 @@ import assert from 'node:assert'
 import { assertRequirements } from './utilities/assert-requirements'
 import { exit } from './utilities/exit'
 
-await assertRequirements()
+let error: unknown
 
-const { _ } = arg({}, { permissive: true })
+try {
+  await assertRequirements()
 
-assert(_.length > 0, `Either of 'workspace' or 'package' sub-command is required.`)
-const command = _[0]
-assert(
-  command === 'workspace' ||
-    command === 'package' ||
-    command === 'cleanup' ||
-    command === 'update-version',
-)
+  const { _ } = arg({}, { permissive: true })
 
-// prettier-ignore
-const run = await ({
-  cleanup: async () => (await import('./pack-cleanup')).packCleanup,
-  package: async () => (await import('./pack-package')).packPackage,
-  'update-version': async () => (await import('./pack-update-version')).packUpdateVersion,
-  workspace: async () => (await import('./pack-workspace')).packWorkspace,
-}[command]())
+  assert(_.length > 0, `Either of 'workspace' or 'package' sub-command is required.`)
 
-const error = await run()
+  const command = _[0]
+
+  assert(
+    command === 'workspace' ||
+      command === 'package' ||
+      command === 'cleanup' ||
+      command === 'update-version',
+  )
+
+  // prettier-ignore
+  const run = await ({
+    cleanup: async () => (await import('./pack-cleanup')).packCleanup,
+    package: async () => (await import('./pack-package')).packPackage,
+    'update-version': async () => (await import('./pack-update-version')).packUpdateVersion,
+    workspace: async () => (await import('./pack-workspace')).packWorkspace,
+  }[command]())
+
+  error = await run()
+} catch (error_) {
+  error = error_
+}
+
 exit(error)

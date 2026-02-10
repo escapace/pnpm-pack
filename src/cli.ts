@@ -15,7 +15,7 @@ const helpMessage = [
   '',
   'Commands:',
   '  package    Package the nearest project (nearest package.json).',
-  '  workspace  Package workspace packages from nearest pnpm-workspace.yaml.',
+  '  workspace  Package all workspace packages, or a filtered subset (nearest pnpm-workspace.yaml).',
   '',
   'Common options:',
   '  --version <semver>         Set package version for packaging and archive names.',
@@ -28,11 +28,11 @@ const helpMessage = [
   '  --silent                   Suppress output from child commands.',
   '',
   'Workspace selection options:',
-  '  --filter <selector>                    pnpm filter selector (repeatable).',
-  '  --filter-prod <selector>               pnpm production filter selector (repeatable).',
-  '  --test-pattern <glob>                  Forwarded to pnpm filtering.',
-  '  --changed-files-ignore-pattern <glob>  Forwarded to pnpm filtering.',
-  '  --workspace-concurrency <number>       Limit workspace command parallelism.',
+  '  --filter <selector>                    Select workspace packages using pnpm filtering selectors.',
+  '  --filter-prod <selector>               Use pnpm selector syntax while omitting devDependencies for dependency selection.',
+  '  --test-pattern <glob>                  Mark test-file globs for pnpm changed-since filtering.',
+  '  --changed-files-ignore-pattern <glob>  Ignore matching files when pnpm computes changed projects.',
+  '  --workspace-concurrency <number>       Set workspace command parallelism.',
 ].join('\n')
 
 type Command = 'cleanup' | 'package' | 'update-version' | 'workspace'

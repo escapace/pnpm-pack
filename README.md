@@ -60,7 +60,8 @@ pnpm-pack workspace --version 1.2.3 --filter-prod @scope/app...
 
 Workspace selection:
 
-- Filtering selectors are documented under pnpm [filtering](https://pnpm.io/filtering) (`--filter`, `--filter-prod`).
-- pnpm documents `--test-pattern` at [`--test-pattern`](https://pnpm.io/filtering#--test-pattern-glob).
-- pnpm documents `--changed-files-ignore-pattern` at [`--changed-files-ignore-pattern`](https://pnpm.io/filtering#--changed-files-ignore-pattern-glob).
-- `--workspace-concurrency <number>` limits parallelism when executing across selected workspace packages.
+- `--filter` selects workspace packages using pnpm [filtering selectors](https://pnpm.io/filtering).
+- `--filter-prod` applies the same selector syntax but omits `devDependencies` when selecting dependency projects.
+- `--test-pattern` marks test-file globs for pnpm changed-since filtering; see [pnpm docs](https://pnpm.io/filtering#--test-pattern-glob).
+- `--changed-files-ignore-pattern` defines globs pnpm should ignore when computing changed projects; see [pnpm docs](https://pnpm.io/filtering#--changed-files-ignore-pattern-glob).
+- `--workspace-concurrency <number>` sets workspace command parallelism.

@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import arg from 'arg'
 import { assertRequirements } from './utilities/assert-requirements'
 import { exit } from './utilities/exit'

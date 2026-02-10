@@ -33,7 +33,7 @@
     "eslint-config-escapace": "5.10.2",
     "esroll": "1.1.1",
     "knip": "5.83.0",
-    "lefthook": "2.0.16",
+    "lefthook": "2.1.0",
     "prettier": "3.8.1",
     "prettier-config-escapace": "1.2.1",
     "syncpack": "13.0.4",

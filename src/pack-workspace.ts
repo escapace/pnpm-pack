@@ -14,6 +14,7 @@ import { getPathDirectoryWorkspace } from './utilities/get-path-directory-worksp
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
 import { readPackageJSON } from './utilities/read-package-json'
 import { getExecaStdio } from './utilities/get-execa-stdio'
+import { redactReadmeLikeFile } from './utilities/redact-readme-like-file'
 
 export async function packWorkspace() {
   let error: Error | undefined
@@ -69,6 +70,8 @@ export async function packWorkspace() {
       : []),
   ].filter((value): value is string => typeof value === 'string')
 
+  const pathCliModule = path.join(import.meta.dirname, 'cli.js')
+
   const pnpmExecArguments = [
     '--fail-if-no-match',
     '--workspace-root',
@@ -84,7 +87,7 @@ export async function packWorkspace() {
     ...(filters.length === 0 ? ['--filter', '*'] : filters),
     'exec',
     'node',
-    path.join(import.meta.dirname, 'cli.js'),
+    pathCliModule,
   ]
 
   try {
@@ -117,6 +120,7 @@ export async function packWorkspace() {
         options.development ? '--development' : undefined,
         options.noOptional ? '--no-optional' : undefined,
         options.production ? '--production' : undefined,
+        options.redactReadme ? undefined : '--no-redact-readme',
         options.silent ? '--silent' : undefined,
         options.extract ? '--extract' : undefined,
         ...[
@@ -165,6 +169,24 @@ export async function packWorkspace() {
     lockfile.importers = importers
 
     await writeWantedLockfile(pathDirectoryTemporaryContext, lockfile)
+
+    if (options.redactReadme) {
+      await redactReadmeLikeFile(pathDirectoryTemporaryContext)
+
+      // Root and package processing run concurrently via pnpm exec.
+      // The root's pnpm pack extraction can overwrite per-package redacted
+      // README content. Re-apply redaction here deterministically after all
+      // package processing is complete.
+      for (const importerPath of Object.keys(lockfile.importers)) {
+        if (importerPath === '.') continue
+
+        const pathImporter = path.join(pathDirectoryTemporaryContext, importerPath)
+
+        if (await fse.exists(pathImporter)) {
+          await redactReadmeLikeFile(pathImporter)
+        }
+      }
+    }
 
     await execa(
       'tar',

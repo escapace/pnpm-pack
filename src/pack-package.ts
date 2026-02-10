@@ -17,6 +17,7 @@ import { readPackageJSON } from './utilities/read-package-json'
 import { writeFileJSON } from './utilities/write-file-json'
 import { pnpmVersion as _pnpmVersion } from './utilities/pnpm-version'
 import { getExecaStdio } from './utilities/get-execa-stdio'
+import { redactReadmeLikeFile } from './utilities/redact-readme-like-file'
 
 export async function packPackage() {
   let error: Error | undefined
@@ -143,24 +144,36 @@ export async function packPackage() {
       if (await fse.exists(pathNodeModules)) {
         await fse.move(pathNodeModules, path.join(pathDirectoryTemporaryContext, 'node_modules'))
       }
-
-      await execa(
-        'tar',
-        [
-          '-czf',
-          pathFileTemporaryArchive,
-          '--strip-components=1',
-          '-C',
-          pathDirectoryTemporary,
-          'package',
-        ],
-        {
-          stdio,
-        },
-      )
     }
 
-    if (isRoot && options.skipWorkspaceRoot) {
+    const skipOutput = isRoot && options.skipWorkspaceRoot
+
+    if (!skipOutput && options.redactReadme) {
+      await redactReadmeLikeFile(pathDirectoryTemporaryContext)
+    }
+
+    const repack = !skipOutput && (options.deployment || options.redactReadme)
+
+    if (repack) {
+      const pathDirectoryRepack = path.join(
+        pathDirectoryTemporary,
+        `_repack-${kebabCase(filenameArchiveDefault)}`,
+      )
+
+      await fse.mkdirp(pathDirectoryRepack)
+      await fse.move(pathDirectoryTemporaryContext, path.join(pathDirectoryRepack, 'package'))
+
+      await execa('tar', ['-czf', pathFileTemporaryArchive, '-C', pathDirectoryRepack, 'package'], {
+        stdio,
+      })
+
+      await fse.move(path.join(pathDirectoryRepack, 'package'), pathDirectoryTemporaryContext, {
+        overwrite: true,
+      })
+      await fse.remove(pathDirectoryRepack)
+    }
+
+    if (skipOutput) {
       await fse.remove(pathFileTemporaryArchive)
     } else {
       // await fse.mkdirp(pathDirectoryPackageContext)

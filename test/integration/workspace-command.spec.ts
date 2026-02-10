@@ -226,3 +226,112 @@ test('workspace command failure still performs cleanup and leaves no extra files
     [...filesBefore, 'packages/good/lib/fixture-failure-good-4.0.0.tgz'].sort(),
   )
 }, 60_000)
+
+// --- Extract conformance: scenario 3 (workspace extract) ---
+
+test('workspace extract produces files at destination root without package/ prefix', async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+  cleanups.add(fixture.cleanup)
+
+  await execa(
+    'node',
+    [
+      pathCli,
+      'workspace',
+      '--silent',
+      '--version',
+      '1.2.3',
+      '--extract',
+      '--pack-destination',
+      'dist/workspace',
+    ],
+    { cwd: fixture.pathDirectoryWorkspace },
+  )
+
+  const extracted = await listFilesRelative(
+    path.join(fixture.pathDirectoryWorkspace, 'dist/workspace'),
+  )
+
+  // Workspace structure at root — no extra package/ prefix
+  assert.equal(extracted.includes('pnpm-lock.yaml'), true)
+  assert.equal(extracted.includes('packages/app/package.json'), true)
+  assert.equal(extracted.includes('packages/lib/package.json'), true)
+  assert.equal(
+    extracted.some((f) => f.startsWith('package/')),
+    false,
+  )
+}, 60_000)
+
+// --- Workspace README redaction tests ---
+
+test('workspace default redacts README content in workspace and per-package artifacts', async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+  cleanups.add(fixture.cleanup)
+
+  await execa(
+    'node',
+    [
+      pathCli,
+      'workspace',
+      '--silent',
+      '--version',
+      '1.2.3',
+      '--extract',
+      '--pack-destination',
+      'dist/workspace',
+    ],
+    { cwd: fixture.pathDirectoryWorkspace },
+  )
+
+  const extractRoot = path.join(fixture.pathDirectoryWorkspace, 'dist/workspace')
+
+  // Workspace root README redacted
+  const workspaceReadme = await readFile(path.join(extractRoot, 'README.md'), 'utf8')
+  assert.equal(workspaceReadme, '')
+
+  // Per-package READMEs redacted
+  const appReadme = await readFile(path.join(extractRoot, 'packages/app/README.md'), 'utf8')
+  assert.equal(appReadme, '')
+
+  const libraryReadme = await readFile(path.join(extractRoot, 'packages/lib/README.md'), 'utf8')
+  assert.equal(libraryReadme, '')
+
+  // Source files unchanged
+  const sourceReadme = await readFile(
+    path.join(fixture.pathDirectoryWorkspace, 'README.md'),
+    'utf8',
+  )
+  assert.ok(sourceReadme.length > 0)
+}, 60_000)
+
+test('workspace --no-redact-readme preserves README content', async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+  cleanups.add(fixture.cleanup)
+
+  await execa(
+    'node',
+    [
+      pathCli,
+      'workspace',
+      '--silent',
+      '--version',
+      '1.2.3',
+      '--no-redact-readme',
+      '--extract',
+      '--pack-destination',
+      'dist/workspace',
+    ],
+    { cwd: fixture.pathDirectoryWorkspace },
+  )
+
+  const extractRoot = path.join(fixture.pathDirectoryWorkspace, 'dist/workspace')
+
+  const workspaceReadme = await readFile(path.join(extractRoot, 'README.md'), 'utf8')
+  assert.ok(workspaceReadme.includes('Workspace Basic'))
+
+  const appReadme = await readFile(path.join(extractRoot, 'packages/app/README.md'), 'utf8')
+  assert.ok(appReadme.includes('App'))
+
+  const libraryReadme = await readFile(path.join(extractRoot, 'packages/lib/README.md'), 'utf8')
+  assert.ok(libraryReadme.includes('Lib'))
+}, 60_000)

@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "files": [
-    "index.js"
+    "index.js",
+    "README.md"
   ],
   "dependencies": {
     "@fixture/basic-lib": "workspace:*"

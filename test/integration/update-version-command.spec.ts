@@ -53,6 +53,7 @@ test('update-version updates nearest package from nested cwd', async () => {
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/index.js',
     'packages/basic/package.json',
     'pnpm-lock.yaml',
@@ -80,6 +81,7 @@ test('update-version rejects invalid semver and does not create extra files', as
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/index.js',
     'packages/basic/package.json',
     'pnpm-lock.yaml',

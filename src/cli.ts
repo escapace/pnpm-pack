@@ -25,6 +25,7 @@ const helpMessage = [
   '  --production               Include production dependencies in the artifact.',
   '  --development              Include development dependencies in the artifact.',
   '  --no-optional              Omit optional dependencies with deployment options.',
+  '  --no-redact-readme         Keep README-like file contents in packaged artifacts.',
   '  --silent                   Suppress output from child commands.',
   '',
   'Workspace selection options:',

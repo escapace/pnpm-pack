@@ -7,6 +7,7 @@ export const argumentsCommon = {
   '--extract': Boolean,
   '--no-build': Boolean,
   '--no-optional': Boolean,
+  '--no-redact-readme': Boolean,
   '--pack-destination': String,
   '--production': Boolean,
   '--silent': Boolean,
@@ -24,6 +25,7 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
 
   const deployment = development || production
 
+  const redactReadme = options['--no-redact-readme'] !== true
   const extract = options['--extract'] === true
   const packDestination = options['--pack-destination'] ?? (extract ? 'lib/package' : 'lib')
   const silent = options['--silent'] === true
@@ -36,6 +38,7 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
     noOptional,
     packDestination,
     production,
+    redactReadme,
     silent,
     version,
   }

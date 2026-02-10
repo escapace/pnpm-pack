@@ -91,6 +91,7 @@ test('package command creates archive and restores package version', async () =>
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/dist/fixture-basic-1.2.3.tgz',
     'packages/basic/index.js',
     'packages/basic/package.json',
@@ -135,7 +136,9 @@ test('package command supports extract mode', async () => {
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/index.js',
+    'packages/basic/out/README.md',
     'packages/basic/out/index.js',
     'packages/basic/out/package.json',
     'packages/basic/package.json',
@@ -170,6 +173,7 @@ test('package command supports explicit archive destination file path', async ()
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/archive/custom.tgz',
     'packages/basic/index.js',
     'packages/basic/package.json',
@@ -205,6 +209,7 @@ test('package command preserves stamped version when no-cleanup is set', async (
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/dist/fixture-basic-1.2.3.tgz',
     'packages/basic/index.js',
     'packages/basic/package.json',
@@ -305,6 +310,7 @@ test('package command rejects absolute pack destination path', async () => {
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/index.js',
     'packages/basic/package.json',
     'pnpm-lock.yaml',
@@ -339,6 +345,7 @@ test('package command rejects extract mode with archive destination path', async
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/index.js',
     'packages/basic/package.json',
     'pnpm-lock.yaml',
@@ -459,4 +466,154 @@ test('package command with production deploy and no-optional excludes optional d
     files,
     [...filesWorkspaceDeployBase, 'packages/app/dist/fixture-app-1.2.3.tgz'].sort(),
   )
+}, 30_000)
+
+// --- Extract conformance: scenario 1 (no repack trigger) ---
+
+test('package extract without repack produces files at destination root', async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
+  cleanups.add(fixture.cleanup)
+
+  const pathDirectoryPackage = path.join(fixture.pathDirectoryWorkspace, 'packages/basic')
+
+  await runInDirectory(pathDirectoryPackage, async () => {
+    const error = await runCli([
+      'package',
+      '--version',
+      '1.2.3',
+      '--extract',
+      '--no-redact-readme',
+      '--pack-destination',
+      'out',
+    ])
+
+    assert.equal(error, undefined)
+  })
+
+  const extracted = await listFilesRelative(path.join(pathDirectoryPackage, 'out'))
+
+  assert.deepEqual(extracted, ['README.md', 'index.js', 'package.json'])
+}, 30_000)
+
+// --- Extract conformance: scenario 2 (repack trigger — default redaction) ---
+
+test('package extract with default redaction produces files at destination root', async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
+  cleanups.add(fixture.cleanup)
+
+  const pathDirectoryPackage = path.join(fixture.pathDirectoryWorkspace, 'packages/basic')
+
+  await runInDirectory(pathDirectoryPackage, async () => {
+    const error = await runCli([
+      'package',
+      '--version',
+      '1.2.3',
+      '--extract',
+      '--pack-destination',
+      'out',
+    ])
+
+    assert.equal(error, undefined)
+  })
+
+  const extracted = await listFilesRelative(path.join(pathDirectoryPackage, 'out'))
+
+  // Same shape as scenario 1 — no prefix drift
+  assert.deepEqual(extracted, ['README.md', 'index.js', 'package.json'])
+
+  // README content is redacted (empty)
+  const readmeContent = await readFile(path.join(pathDirectoryPackage, 'out/README.md'), 'utf8')
+  assert.equal(readmeContent, '')
+}, 30_000)
+
+// --- Extract conformance: scenario 2 variant (repack trigger — deployment) ---
+
+test('package extract with production deploy produces files at destination root', async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-deploy-flags' })
+  cleanups.add(fixture.cleanup)
+
+  const pathDirectoryPackage = path.join(fixture.pathDirectoryWorkspace, 'packages/app')
+
+  await runInDirectory(pathDirectoryPackage, async () => {
+    const error = await runCli([
+      'package',
+      '--version',
+      '1.2.3',
+      '--extract',
+      '--production',
+      '--no-redact-readme',
+      '--pack-destination',
+      'out',
+    ])
+
+    assert.equal(error, undefined)
+  })
+
+  // Files at destination root, not under packages/app/
+  await assertFileExists(path.join(pathDirectoryPackage, 'out/index.js'))
+  await assertFileExists(path.join(pathDirectoryPackage, 'out/package.json'))
+  await assertFileExists(
+    path.join(pathDirectoryPackage, 'out/node_modules/@fixture/prod-dep/package.json'),
+  )
+
+  const extracted = await listFilesRelative(path.join(pathDirectoryPackage, 'out'))
+
+  assert.equal(
+    extracted.some((f) => f.startsWith('packages/')),
+    false,
+  )
+}, 30_000)
+
+// --- README redaction tests ---
+
+test('package default redacts README content in archive', async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
+  cleanups.add(fixture.cleanup)
+
+  const pathDirectoryPackage = path.join(fixture.pathDirectoryWorkspace, 'packages/basic')
+
+  await runInDirectory(pathDirectoryPackage, async () => {
+    const error = await runCli([
+      'package',
+      '--version',
+      '1.2.3',
+      '--extract',
+      '--pack-destination',
+      'out',
+    ])
+
+    assert.equal(error, undefined)
+  })
+
+  // Redacted: file exists but is empty
+  const readmeContent = await readFile(path.join(pathDirectoryPackage, 'out/README.md'), 'utf8')
+  assert.equal(readmeContent, '')
+
+  // Source fixture unchanged
+  const sourceReadme = await readFile(path.join(pathDirectoryPackage, 'README.md'), 'utf8')
+  assert.ok(sourceReadme.length > 0)
+}, 30_000)
+
+test('package --no-redact-readme preserves README content', async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
+  cleanups.add(fixture.cleanup)
+
+  const pathDirectoryPackage = path.join(fixture.pathDirectoryWorkspace, 'packages/basic')
+
+  await runInDirectory(pathDirectoryPackage, async () => {
+    const error = await runCli([
+      'package',
+      '--version',
+      '1.2.3',
+      '--extract',
+      '--no-redact-readme',
+      '--pack-destination',
+      'out',
+    ])
+
+    assert.equal(error, undefined)
+  })
+
+  const readmeContent = await readFile(path.join(pathDirectoryPackage, 'out/README.md'), 'utf8')
+  assert.ok(readmeContent.includes('Basic'))
 }, 30_000)

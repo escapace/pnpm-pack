@@ -24,6 +24,7 @@ By default, artifacts are written to `./lib`. With `--extract`, the destination 
 - `--no-build` skips running `pnpm run build` before packaging.
 - `--production` and `--development` create an artifact that includes an isolated `node_modules` based on pnpm deploy behavior.
 - `--no-optional` omits optional dependencies when `--production` or `--development` is used.
+- `--no-redact-readme` keeps README-like file contents in packaged artifacts.
 - `--silent` suppresses output from child commands (`pnpm`, `tar`, and build scripts).
 
 Destination constraints:

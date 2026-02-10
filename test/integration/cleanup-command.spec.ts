@@ -53,6 +53,7 @@ test('cleanup resets version to 0.0.0 in package directory', async () => {
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/index.js',
     'packages/basic/package.json',
     'pnpm-lock.yaml',
@@ -87,6 +88,7 @@ test('cleanup works from nested cwd and updates nearest package', async () => {
   assert.deepEqual(files, [
     'node_modules/.pnpm-workspace-state-v1.json',
     'package.json',
+    'packages/basic/README.md',
     'packages/basic/index.js',
     'packages/basic/package.json',
     'pnpm-lock.yaml',

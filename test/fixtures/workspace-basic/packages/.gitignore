@@ -1,0 +1,4 @@
+# Re-include fixture package directory named "lib".
+# Root .gitignore ignores "lib" globally.
+!lib/
+!lib/**

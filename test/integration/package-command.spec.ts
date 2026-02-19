@@ -2,7 +2,7 @@ import assert from 'node:assert'
 import { access, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
-import { afterEach, test } from 'vitest'
+import { afterEach, it } from 'vitest'
 import { prepareFixture } from '../support/prepare-fixture'
 import { listFilesRelative } from '../support/list-files-relative'
 import { listTarEntries } from '../support/tar'
@@ -71,7 +71,7 @@ const filesWorkspaceDeployBase = [
   'pnpm-workspace.yaml',
 ] as const
 
-test('package command creates archive and restores package version', async () => {
+it('package command creates archive and restores package version', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -100,7 +100,7 @@ test('package command creates archive and restores package version', async () =>
   ])
 }, 30_000)
 
-test('package command supports extract mode', async () => {
+it('package command supports extract mode', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -147,7 +147,7 @@ test('package command supports extract mode', async () => {
   ])
 }, 30_000)
 
-test('package command supports explicit archive destination file path', async () => {
+it('package command supports explicit archive destination file path', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -182,7 +182,7 @@ test('package command supports explicit archive destination file path', async ()
   ])
 }, 30_000)
 
-test('package command preserves stamped version when no-cleanup is set', async () => {
+it('package command preserves stamped version when no-cleanup is set', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -218,7 +218,7 @@ test('package command preserves stamped version when no-cleanup is set', async (
   ])
 }, 30_000)
 
-test('package command runs build script by default', async () => {
+it('package command runs build script by default', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-package-build' })
   cleanups.add(fixture.cleanup)
 
@@ -248,7 +248,7 @@ test('package command runs build script by default', async () => {
   ])
 }, 30_000)
 
-test('package command skips build script when no-build is set', async () => {
+it('package command skips build script when no-build is set', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-package-build' })
   cleanups.add(fixture.cleanup)
 
@@ -283,7 +283,7 @@ test('package command skips build script when no-build is set', async () => {
   ])
 }, 30_000)
 
-test('package command rejects absolute pack destination path', async () => {
+it('package command rejects absolute pack destination path', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -318,7 +318,7 @@ test('package command rejects absolute pack destination path', async () => {
   ])
 }, 30_000)
 
-test('package command rejects extract mode with archive destination path', async () => {
+it('package command rejects extract mode with archive destination path', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -353,7 +353,7 @@ test('package command rejects extract mode with archive destination path', async
   ])
 }, 30_000)
 
-test('package command with production deploy includes production and optional deps only', async () => {
+it('package command with production deploy includes production and optional deps only', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-deploy-flags' })
   cleanups.add(fixture.cleanup)
 
@@ -391,7 +391,7 @@ test('package command with production deploy includes production and optional de
   )
 }, 30_000)
 
-test('package command with development deploy includes dev deps only', async () => {
+it('package command with development deploy includes dev deps only', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-deploy-flags' })
   cleanups.add(fixture.cleanup)
 
@@ -429,7 +429,7 @@ test('package command with development deploy includes dev deps only', async () 
   )
 }, 30_000)
 
-test('package command with production deploy and no-optional excludes optional deps', async () => {
+it('package command with production deploy and no-optional excludes optional deps', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-deploy-flags' })
   cleanups.add(fixture.cleanup)
 
@@ -470,7 +470,7 @@ test('package command with production deploy and no-optional excludes optional d
 
 // --- Extract conformance: scenario 1 (no repack trigger) ---
 
-test('package extract without repack produces files at destination root', async () => {
+it('package extract without repack produces files at destination root', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -497,7 +497,7 @@ test('package extract without repack produces files at destination root', async 
 
 // --- Extract conformance: scenario 2 (repack trigger — default redaction) ---
 
-test('package extract with default redaction produces files at destination root', async () => {
+it('package extract with default redaction produces files at destination root', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -528,7 +528,7 @@ test('package extract with default redaction produces files at destination root'
 
 // --- Extract conformance: scenario 2 variant (repack trigger — deployment) ---
 
-test('package extract with production deploy produces files at destination root', async () => {
+it('package extract with production deploy produces files at destination root', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-deploy-flags' })
   cleanups.add(fixture.cleanup)
 
@@ -566,7 +566,7 @@ test('package extract with production deploy produces files at destination root'
 
 // --- README redaction tests ---
 
-test('package default redacts README content in archive', async () => {
+it('package default redacts README content in archive', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -594,7 +594,7 @@ test('package default redacts README content in archive', async () => {
   assert.ok(sourceReadme.length > 0)
 }, 30_000)
 
-test('package --no-redact-readme preserves README content', async () => {
+it('package --no-redact-readme preserves README content', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 

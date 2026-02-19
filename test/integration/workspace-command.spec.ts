@@ -2,7 +2,7 @@ import assert from 'node:assert'
 import { access, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { execa } from 'execa'
-import { afterEach, test } from 'vitest'
+import { afterEach, it } from 'vitest'
 import { listFilesRelative } from '../support/list-files-relative'
 import { prepareFixture } from '../support/prepare-fixture'
 import { listTarEntries } from '../support/tar'
@@ -39,7 +39,7 @@ const readVersion = async (pathDirectoryPackage: string) => {
   return packageJSON.version
 }
 
-test('workspace command packages all packages by default filter', async () => {
+it('workspace command packages all packages by default filter', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-basic' })
   cleanups.add(fixture.cleanup)
 
@@ -85,7 +85,7 @@ test('workspace command packages all packages by default filter', async () => {
   )
 }, 60_000)
 
-test('workspace command honors filter-prod by excluding dev dependency projects', async () => {
+it('workspace command honors filter-prod by excluding dev dependency projects', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-filtered' })
   cleanups.add(fixture.cleanup)
 
@@ -145,7 +145,7 @@ test('workspace command honors filter-prod by excluding dev dependency projects'
   )
 }, 60_000)
 
-test('workspace command accepts test-pattern and changed-files-ignore-pattern flags', async () => {
+it('workspace command accepts test-pattern and changed-files-ignore-pattern flags', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-basic' })
   cleanups.add(fixture.cleanup)
 
@@ -189,7 +189,7 @@ test('workspace command accepts test-pattern and changed-files-ignore-pattern fl
   )
 }, 60_000)
 
-test('workspace command failure still performs cleanup and leaves no extra files', async () => {
+it('workspace command failure still performs cleanup and leaves no extra files', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-failure' })
   cleanups.add(fixture.cleanup)
 
@@ -229,7 +229,7 @@ test('workspace command failure still performs cleanup and leaves no extra files
 
 // --- Extract conformance: scenario 3 (workspace extract) ---
 
-test('workspace extract produces files at destination root without package/ prefix', async () => {
+it('workspace extract produces files at destination root without package/ prefix', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-basic' })
   cleanups.add(fixture.cleanup)
 
@@ -264,7 +264,7 @@ test('workspace extract produces files at destination root without package/ pref
 
 // --- Workspace README redaction tests ---
 
-test('workspace default redacts README content in workspace and per-package artifacts', async () => {
+it('workspace default redacts README content in workspace and per-package artifacts', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-basic' })
   cleanups.add(fixture.cleanup)
 
@@ -304,7 +304,7 @@ test('workspace default redacts README content in workspace and per-package arti
   assert.ok(sourceReadme.length > 0)
 }, 60_000)
 
-test('workspace --no-redact-readme preserves README content', async () => {
+it('workspace --no-redact-readme preserves README content', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-basic' })
   cleanups.add(fixture.cleanup)
 

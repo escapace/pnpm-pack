@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { test } from 'vitest'
+import { it } from 'vitest'
 
 interface PackageJSON {
   dependencies?: Record<string, string>
@@ -37,7 +37,7 @@ const workspaceDependencyEntries = (packageJSON: PackageJSON) =>
     .flatMap((value) => Object.entries(value))
     .filter(([, range]) => range.startsWith('workspace:'))
 
-test('fixtures keep workspace dependency references internally consistent', async () => {
+it('fixtures keep workspace dependency references internally consistent', async () => {
   const pathDirectoryFixtures = path.resolve(import.meta.dirname, '../fixtures')
   const fixtures = await listDirectories(pathDirectoryFixtures)
 

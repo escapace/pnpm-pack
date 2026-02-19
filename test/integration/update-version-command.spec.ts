@@ -2,7 +2,7 @@ import assert from 'node:assert'
 import { mkdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
-import { afterEach, test } from 'vitest'
+import { afterEach, it } from 'vitest'
 import { prepareFixture } from '../support/prepare-fixture'
 import { listFilesRelative } from '../support/list-files-relative'
 import { runCli } from './run-cli'
@@ -29,7 +29,7 @@ const runInDirectory = async (directory: string, function_: () => Promise<void>)
   }
 }
 
-test('update-version updates nearest package from nested cwd', async () => {
+it('update-version updates nearest package from nested cwd', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 
@@ -61,7 +61,7 @@ test('update-version updates nearest package from nested cwd', async () => {
   ])
 })
 
-test('update-version rejects invalid semver and does not create extra files', async () => {
+it('update-version rejects invalid semver and does not create extra files', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })
   cleanups.add(fixture.cleanup)
 

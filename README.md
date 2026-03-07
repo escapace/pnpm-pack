@@ -1,6 +1,6 @@
 # pnpm-pack
 
-`pnpm-pack` packages pnpm projects and workspaces into a gzip-compressed tarball (`.tgz`) by default, or extracts package files to a directory when `--extract` is used.
+`pnpm-pack` packages pnpm projects and workspaces into a gzip-compressed tarball (`.tgz`) by default, a `.zip` archive when the destination path ends in `.zip`, or extracts package files to a directory when `--extract` is used.
 
 Available commands:
 
@@ -19,19 +19,37 @@ By default, artifacts are written to `./lib`. With `--extract`, the destination 
 ## Common options
 
 - `--version <semver>` sets the version used for packaging and for resulting artifact names.
-- `--pack-destination <path>` controls where artifacts are written.
-- `--extract` extracts package files to a directory instead of writing a tarball.
+- `--pack-destination <path>` controls where artifacts are written. Use a `.zip` extension to produce a zip archive instead of a tarball.
+- `--extract` extracts package files to a directory instead of writing an archive.
 - `--no-build` skips running `pnpm run build` before packaging.
 - `--production` and `--development` create an artifact that includes an isolated `node_modules` based on pnpm deploy behavior.
 - `--no-optional` omits optional dependencies when `--production` or `--development` is used.
 - `--no-redact-readme` keeps README-like file contents in packaged artifacts.
+- `--umask <octal>` sets the file permission umask applied to archive entries and extracted files. Default: `0o022`. Use `--umask 0` to disable permission normalization.
 - `--silent` suppresses output from child commands (`pnpm`, `tar`, and build scripts).
 
 Destination constraints:
 
 - `--pack-destination` must be a relative path.
 - With `--extract`, `--pack-destination` must be a directory path (for example `dist/package`).
-- Without `--extract`, `--pack-destination` may be a directory path or an explicit tarball path ending in `.tgz` / `.tar.gz`.
+- Without `--extract`, `--pack-destination` may be a directory path or an explicit archive path ending in `.tgz` / `.tar.gz` / `.zip`.
+
+## Archive format
+
+The output format is inferred from `--pack-destination`:
+
+- Directory path or `.tgz` / `.tar.gz` extension → gzip-compressed tarball (default).
+- `.zip` extension → zip archive.
+
+## AWS Lambda deployment
+
+To produce a zip archive suitable for AWS Lambda with correct file permissions:
+
+```bash
+pnpm-pack package --version 1.2.3 --production --pack-destination dist/lambda.zip
+```
+
+The default umask `0o022` ensures files have `644` (`rw-r--r--`) and directories have `755` (`rwxr-xr-x`) permissions, which Lambda requires.
 
 ## Command: `package`
 
@@ -49,12 +67,13 @@ Packages a workspace from the nearest workspace root (`pnpm-workspace.yaml`).
 
 By default, the workspace archive is written to `./lib/<workspace-root-name>-<version>.tgz`.
 
-Workspace packaging also writes per-package tarballs under each selected package’s `lib/` directory.
+Workspace packaging also writes per-package tarballs under each selected package's `lib/` directory.
 
 Examples:
 
 ```bash
 pnpm-pack workspace --version 1.2.3 --pack-destination dist
+pnpm-pack workspace --version 1.2.3 --pack-destination dist/workspace.zip
 pnpm-pack workspace --version 1.2.3 --filter @scope/app...
 pnpm-pack workspace --version 1.2.3 --filter-prod @scope/app...
 ```

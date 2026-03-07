@@ -9,10 +9,12 @@ import path from 'node:path'
 import process from 'node:process'
 import { isNativeError } from 'node:util/types'
 import { argumentsCommon, argumentsCommonParse } from './arguments-common'
+import { createArchive } from './utilities/create-archive'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryPackage } from './utilities/get-path-directory-package'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
+import { normalizePermissionsRecursive } from './utilities/normalize-permissions'
 import { readPackageJSON } from './utilities/read-package-json'
 import { writeFileJSON } from './utilities/write-file-json'
 import { pnpmVersion as _pnpmVersion } from './utilities/pnpm-version'
@@ -61,7 +63,7 @@ export async function packPackage() {
     version: options.version,
   })
 
-  const { pathDirectoryDestination, pathFileDestinationArchive } =
+  const { format, pathDirectoryDestination, pathFileDestinationArchive } =
     normalizePathDirectoryDestination({
       extract: options.extract,
       filenameArchiveDefault,
@@ -155,28 +157,18 @@ export async function packPackage() {
     const repack = !skipOutput && (options.deployment || options.redactReadme)
 
     if (repack) {
-      const pathDirectoryRepack = path.join(
-        pathDirectoryTemporary,
-        `_repack-${kebabCase(filenameArchiveDefault)}`,
-      )
-
-      await fse.mkdirp(pathDirectoryRepack)
-      await fse.move(pathDirectoryTemporaryContext, path.join(pathDirectoryRepack, 'package'))
-
-      await execa('tar', ['-czf', pathFileTemporaryArchive, '-C', pathDirectoryRepack, 'package'], {
-        stdio,
+      await createArchive({
+        entryPrefix: 'package',
+        format: 'tgz',
+        outputPath: pathFileTemporaryArchive,
+        sourceDirectory: pathDirectoryTemporaryContext,
+        umask: options.umask,
       })
-
-      await fse.move(path.join(pathDirectoryRepack, 'package'), pathDirectoryTemporaryContext, {
-        overwrite: true,
-      })
-      await fse.remove(pathDirectoryRepack)
     }
 
     if (skipOutput) {
       await fse.remove(pathFileTemporaryArchive)
     } else {
-      // await fse.mkdirp(pathDirectoryPackageContext)
       if (options.extract) {
         await fse.emptydir(pathDirectoryDestination)
 
@@ -193,8 +185,31 @@ export async function packPackage() {
             stdio,
           },
         )
+
+        await normalizePermissionsRecursive(pathDirectoryDestination, options.umask)
+      } else if (format === 'zip') {
+        await fse.mkdirp(pathDirectoryDestination)
+
+        await createArchive({
+          entryPrefix: '',
+          format: 'zip',
+          outputPath: pathFileDestinationArchive,
+          sourceDirectory: pathDirectoryTemporaryContext,
+          umask: options.umask,
+        })
       } else {
         await fse.mkdirp(pathDirectoryDestination)
+
+        if (!repack) {
+          await createArchive({
+            entryPrefix: 'package',
+            format: 'tgz',
+            outputPath: pathFileTemporaryArchive,
+            sourceDirectory: pathDirectoryTemporaryContext,
+            umask: options.umask,
+          })
+        }
+
         await fse.move(pathFileTemporaryArchive, pathFileDestinationArchive, {
           overwrite: true,
         })

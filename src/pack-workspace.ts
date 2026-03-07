@@ -9,9 +9,11 @@ import os from 'node:os'
 import path from 'node:path'
 import { isNativeError } from 'node:util/types'
 import { argumentsCommon, argumentsCommonParse } from './arguments-common'
+import { createArchive } from './utilities/create-archive'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
+import { normalizePermissionsRecursive } from './utilities/normalize-permissions'
 import { readPackageJSON } from './utilities/read-package-json'
 import { getExecaStdio } from './utilities/get-execa-stdio'
 import { redactReadmeLikeFile } from './utilities/redact-readme-like-file'
@@ -53,7 +55,7 @@ export async function packWorkspace() {
     version: options.version,
   })
 
-  const { pathDirectoryDestination, pathFileDestinationArchive } =
+  const { format, pathDirectoryDestination, pathFileDestinationArchive } =
     normalizePathDirectoryDestination({
       extract: options.extract,
       filenameArchiveDefault,
@@ -123,6 +125,8 @@ export async function packWorkspace() {
         options.redactReadme ? undefined : '--no-redact-readme',
         options.silent ? '--silent' : undefined,
         options.extract ? '--extract' : undefined,
+        '--umask',
+        `0o${options.umask.toString(8)}`,
         ...[
           options.packDestination === undefined
             ? []
@@ -188,14 +192,13 @@ export async function packWorkspace() {
       }
     }
 
-    await execa(
-      'tar',
-      ['-czf', pathFileTemporaryArchive, '-C', pathDirectoryTemporary, 'package'],
-      {
-        cwd: pathDirectoryWorkspace,
-        stdio,
-      },
-    )
+    await createArchive({
+      entryPrefix: 'package',
+      format: 'tgz',
+      outputPath: pathFileTemporaryArchive,
+      sourceDirectory: pathDirectoryTemporaryContext,
+      umask: options.umask,
+    })
 
     assert(await fse.exists(pathFileTemporaryArchive), `${pathFileTemporaryArchive}: No such file`)
 
@@ -211,6 +214,33 @@ export async function packWorkspace() {
           stdio,
         },
       )
+
+      await normalizePermissionsRecursive(pathDirectoryDestination, options.umask)
+    } else if (format === 'zip') {
+      // For zip output, we need to re-extract the tgz to a temp directory
+      // and create the zip from the extracted contents.
+      const pathDirectoryZipSource = path.join(pathDirectoryTemporary, '_zip-source')
+      await fse.mkdirp(pathDirectoryZipSource)
+
+      await execa(
+        'tar',
+        ['-xzf', pathFileTemporaryArchive, '--strip-components=1', '-C', pathDirectoryZipSource],
+        {
+          stdio,
+        },
+      )
+
+      await fse.mkdirp(pathDirectoryDestination)
+
+      await createArchive({
+        entryPrefix: '',
+        format: 'zip',
+        outputPath: pathFileDestinationArchive,
+        sourceDirectory: pathDirectoryZipSource,
+        umask: options.umask,
+      })
+
+      await fse.remove(pathDirectoryZipSource)
     } else {
       await fse.mkdirp(pathDirectoryDestination)
       await fse.move(pathFileTemporaryArchive, pathFileDestinationArchive, {

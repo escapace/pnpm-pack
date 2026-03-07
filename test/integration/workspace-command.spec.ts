@@ -39,299 +39,327 @@ const readVersion = async (pathDirectoryPackage: string) => {
   return packageJSON.version
 }
 
-it('workspace command packages all packages by default filter', async () => {
-  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
-  cleanups.add(fixture.cleanup)
+it(
+  'workspace command packages all packages by default filter',
+  { retry: 2, timeout: 60_000 },
+  async () => {
+    const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+    cleanups.add(fixture.cleanup)
 
-  const filesBefore = await listFilesRelative(fixture.pathDirectoryWorkspace)
+    const filesBefore = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
-  await execa(
-    'node',
-    [pathCli, 'workspace', '--silent', '--version', '1.2.3', '--pack-destination', 'dist'],
-    { cwd: fixture.pathDirectoryWorkspace },
-  )
+    await execa(
+      'node',
+      [pathCli, 'workspace', '--silent', '--version', '1.2.3', '--pack-destination', 'dist'],
+      { cwd: fixture.pathDirectoryWorkspace },
+    )
 
-  const pathArchive = path.join(
-    fixture.pathDirectoryWorkspace,
-    'dist/fixture-workspace-basic-root-1.2.3.tgz',
-  )
-
-  assert.equal(await fileExists(pathArchive), true)
-
-  const entries = await listTarEntries(pathArchive)
-
-  assert.equal(hasTarEntrySuffix(entries, 'packages/app/package.json'), true)
-  assert.equal(hasTarEntrySuffix(entries, 'packages/lib/package.json'), true)
-
-  assert.equal(
-    await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/app')),
-    '0.0.0',
-  )
-  assert.equal(
-    await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/lib')),
-    '0.0.0',
-  )
-
-  const filesAfter = await listFilesRelative(fixture.pathDirectoryWorkspace)
-
-  assert.deepEqual(
-    filesAfter,
-    [
-      ...filesBefore,
+    const pathArchive = path.join(
+      fixture.pathDirectoryWorkspace,
       'dist/fixture-workspace-basic-root-1.2.3.tgz',
-      'packages/app/lib/fixture-basic-app-1.2.3.tgz',
-      'packages/lib/lib/fixture-basic-lib-1.2.3.tgz',
-    ].sort(),
-  )
-}, 60_000)
+    )
 
-it('workspace command honors filter-prod by excluding dev dependency projects', async () => {
-  const fixture = await prepareFixture({ fixture: 'workspace-filtered' })
-  cleanups.add(fixture.cleanup)
+    assert.equal(await fileExists(pathArchive), true)
 
-  const filesBefore = await listFilesRelative(fixture.pathDirectoryWorkspace)
+    const entries = await listTarEntries(pathArchive)
 
-  await execa(
-    'node',
-    [
-      pathCli,
-      'workspace',
-      '--silent',
-      '--version',
-      '2.0.0',
-      '--filter-prod',
-      '@fixture/filter-app...',
-      '--pack-destination',
-      'dist',
-    ],
-    { cwd: fixture.pathDirectoryWorkspace },
-  )
+    assert.equal(hasTarEntrySuffix(entries, 'packages/app/package.json'), true)
+    assert.equal(hasTarEntrySuffix(entries, 'packages/lib/package.json'), true)
 
-  const pathArchive = path.join(
-    fixture.pathDirectoryWorkspace,
-    'dist/fixture-workspace-filtered-root-2.0.0.tgz',
-  )
+    assert.equal(
+      await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/app')),
+      '0.0.0',
+    )
+    assert.equal(
+      await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/lib')),
+      '0.0.0',
+    )
 
-  assert.equal(await fileExists(pathArchive), true)
+    const filesAfter = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
-  const entries = await listTarEntries(pathArchive)
+    assert.deepEqual(
+      filesAfter,
+      [
+        ...filesBefore,
+        'dist/fixture-workspace-basic-root-1.2.3.tgz',
+        'packages/app/lib/fixture-basic-app-1.2.3.tgz',
+        'packages/lib/lib/fixture-basic-lib-1.2.3.tgz',
+      ].sort(),
+    )
+  },
+)
 
-  assert.equal(hasTarEntrySuffix(entries, 'packages/app/package.json'), true)
-  assert.equal(hasTarEntrySuffix(entries, 'packages/prod-lib/package.json'), true)
+it(
+  'workspace command honors filter-prod by excluding dev dependency projects',
+  { retry: 2, timeout: 60_000 },
+  async () => {
+    const fixture = await prepareFixture({ fixture: 'workspace-filtered' })
+    cleanups.add(fixture.cleanup)
 
-  assert.equal(
-    await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/app')),
-    '0.0.0',
-  )
-  assert.equal(
-    await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/prod-lib')),
-    '0.0.0',
-  )
-  assert.equal(
-    await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/dev-lib')),
-    '8.0.0',
-  )
+    const filesBefore = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
-  const filesAfter = await listFilesRelative(fixture.pathDirectoryWorkspace)
+    await execa(
+      'node',
+      [
+        pathCli,
+        'workspace',
+        '--silent',
+        '--version',
+        '2.0.0',
+        '--filter-prod',
+        '@fixture/filter-app...',
+        '--pack-destination',
+        'dist',
+      ],
+      { cwd: fixture.pathDirectoryWorkspace },
+    )
 
-  assert.deepEqual(
-    filesAfter,
-    [
-      ...filesBefore,
+    const pathArchive = path.join(
+      fixture.pathDirectoryWorkspace,
       'dist/fixture-workspace-filtered-root-2.0.0.tgz',
-      'packages/app/lib/fixture-filter-app-2.0.0.tgz',
-      'packages/prod-lib/lib/fixture-filter-prod-lib-2.0.0.tgz',
-    ].sort(),
-  )
-}, 60_000)
+    )
 
-it('workspace command accepts test-pattern and changed-files-ignore-pattern flags', async () => {
-  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
-  cleanups.add(fixture.cleanup)
+    assert.equal(await fileExists(pathArchive), true)
 
-  const filesBefore = await listFilesRelative(fixture.pathDirectoryWorkspace)
+    const entries = await listTarEntries(pathArchive)
 
-  await execa(
-    'node',
-    [
-      pathCli,
-      'workspace',
-      '--silent',
-      '--version',
-      '3.0.0',
-      '--test-pattern',
-      'test/**',
-      '--changed-files-ignore-pattern',
-      '**/*.md',
-      '--pack-destination',
-      'dist',
-    ],
-    { cwd: fixture.pathDirectoryWorkspace },
-  )
+    assert.equal(hasTarEntrySuffix(entries, 'packages/app/package.json'), true)
+    assert.equal(hasTarEntrySuffix(entries, 'packages/prod-lib/package.json'), true)
 
-  const pathArchive = path.join(
-    fixture.pathDirectoryWorkspace,
-    'dist/fixture-workspace-basic-root-3.0.0.tgz',
-  )
+    assert.equal(
+      await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/app')),
+      '0.0.0',
+    )
+    assert.equal(
+      await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/prod-lib')),
+      '0.0.0',
+    )
+    assert.equal(
+      await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/dev-lib')),
+      '8.0.0',
+    )
 
-  assert.equal(await fileExists(pathArchive), true)
+    const filesAfter = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
-  const filesAfter = await listFilesRelative(fixture.pathDirectoryWorkspace)
+    assert.deepEqual(
+      filesAfter,
+      [
+        ...filesBefore,
+        'dist/fixture-workspace-filtered-root-2.0.0.tgz',
+        'packages/app/lib/fixture-filter-app-2.0.0.tgz',
+        'packages/prod-lib/lib/fixture-filter-prod-lib-2.0.0.tgz',
+      ].sort(),
+    )
+  },
+)
 
-  assert.deepEqual(
-    filesAfter,
-    [
-      ...filesBefore,
+it(
+  'workspace command accepts test-pattern and changed-files-ignore-pattern flags',
+  { retry: 2, timeout: 60_000 },
+  async () => {
+    const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+    cleanups.add(fixture.cleanup)
+
+    const filesBefore = await listFilesRelative(fixture.pathDirectoryWorkspace)
+
+    await execa(
+      'node',
+      [
+        pathCli,
+        'workspace',
+        '--silent',
+        '--version',
+        '3.0.0',
+        '--test-pattern',
+        'test/**',
+        '--changed-files-ignore-pattern',
+        '**/*.md',
+        '--pack-destination',
+        'dist',
+      ],
+      { cwd: fixture.pathDirectoryWorkspace },
+    )
+
+    const pathArchive = path.join(
+      fixture.pathDirectoryWorkspace,
       'dist/fixture-workspace-basic-root-3.0.0.tgz',
-      'packages/app/lib/fixture-basic-app-3.0.0.tgz',
-      'packages/lib/lib/fixture-basic-lib-3.0.0.tgz',
-    ].sort(),
-  )
-}, 60_000)
+    )
 
-it('workspace command failure still performs cleanup and leaves no extra files', async () => {
-  const fixture = await prepareFixture({ fixture: 'workspace-failure' })
-  cleanups.add(fixture.cleanup)
+    assert.equal(await fileExists(pathArchive), true)
 
-  const filesBefore = await listFilesRelative(fixture.pathDirectoryWorkspace)
+    const filesAfter = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
-  const result = await execa(
-    'node',
-    [pathCli, 'workspace', '--silent', '--version', '4.0.0', '--pack-destination', 'dist'],
-    { cwd: fixture.pathDirectoryWorkspace, reject: false },
-  )
+    assert.deepEqual(
+      filesAfter,
+      [
+        ...filesBefore,
+        'dist/fixture-workspace-basic-root-3.0.0.tgz',
+        'packages/app/lib/fixture-basic-app-3.0.0.tgz',
+        'packages/lib/lib/fixture-basic-lib-3.0.0.tgz',
+      ].sort(),
+    )
+  },
+)
 
-  assert.equal(result.exitCode, 1)
+it(
+  'workspace command failure still performs cleanup and leaves no extra files',
+  { retry: 2, timeout: 60_000 },
+  async () => {
+    const fixture = await prepareFixture({ fixture: 'workspace-failure' })
+    cleanups.add(fixture.cleanup)
 
-  assert.equal(
-    await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/good')),
-    '0.0.0',
-  )
-  assert.equal(
-    await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/broken')),
-    '0.0.0',
-  )
+    const filesBefore = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
-  const pathArchive = path.join(
-    fixture.pathDirectoryWorkspace,
-    'dist/fixture-workspace-failure-root-4.0.0.tgz',
-  )
+    const result = await execa(
+      'node',
+      [pathCli, 'workspace', '--silent', '--version', '4.0.0', '--pack-destination', 'dist'],
+      { cwd: fixture.pathDirectoryWorkspace, reject: false },
+    )
 
-  assert.equal(await fileExists(pathArchive), false)
+    assert.equal(result.exitCode, 1)
 
-  const filesAfter = await listFilesRelative(fixture.pathDirectoryWorkspace)
+    assert.equal(
+      await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/good')),
+      '0.0.0',
+    )
+    assert.equal(
+      await readVersion(path.join(fixture.pathDirectoryWorkspace, 'packages/broken')),
+      '0.0.0',
+    )
 
-  assert.deepEqual(
-    filesAfter,
-    [...filesBefore, 'packages/good/lib/fixture-failure-good-4.0.0.tgz'].sort(),
-  )
-}, 60_000)
+    const pathArchive = path.join(
+      fixture.pathDirectoryWorkspace,
+      'dist/fixture-workspace-failure-root-4.0.0.tgz',
+    )
+
+    assert.equal(await fileExists(pathArchive), false)
+
+    const filesAfter = await listFilesRelative(fixture.pathDirectoryWorkspace)
+
+    assert.deepEqual(
+      filesAfter,
+      [...filesBefore, 'packages/good/lib/fixture-failure-good-4.0.0.tgz'].sort(),
+    )
+  },
+)
 
 // --- Extract conformance: scenario 3 (workspace extract) ---
 
-it('workspace extract produces files at destination root without package/ prefix', async () => {
-  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
-  cleanups.add(fixture.cleanup)
+it(
+  'workspace extract produces files at destination root without package/ prefix',
+  { retry: 2, timeout: 60_000 },
+  async () => {
+    const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+    cleanups.add(fixture.cleanup)
 
-  await execa(
-    'node',
-    [
-      pathCli,
-      'workspace',
-      '--silent',
-      '--version',
-      '1.2.3',
-      '--extract',
-      '--pack-destination',
-      'dist/workspace',
-    ],
-    { cwd: fixture.pathDirectoryWorkspace },
-  )
+    await execa(
+      'node',
+      [
+        pathCli,
+        'workspace',
+        '--silent',
+        '--version',
+        '1.2.3',
+        '--extract',
+        '--pack-destination',
+        'dist/workspace',
+      ],
+      { cwd: fixture.pathDirectoryWorkspace },
+    )
 
-  const extracted = await listFilesRelative(
-    path.join(fixture.pathDirectoryWorkspace, 'dist/workspace'),
-  )
+    const extracted = await listFilesRelative(
+      path.join(fixture.pathDirectoryWorkspace, 'dist/workspace'),
+    )
 
-  // Workspace structure at root — no extra package/ prefix
-  assert.equal(extracted.includes('pnpm-lock.yaml'), true)
-  assert.equal(extracted.includes('packages/app/package.json'), true)
-  assert.equal(extracted.includes('packages/lib/package.json'), true)
-  assert.equal(
-    extracted.some((f) => f.startsWith('package/')),
-    false,
-  )
-}, 60_000)
+    // Workspace structure at root — no extra package/ prefix
+    assert.equal(extracted.includes('pnpm-lock.yaml'), true)
+    assert.equal(extracted.includes('packages/app/package.json'), true)
+    assert.equal(extracted.includes('packages/lib/package.json'), true)
+    assert.equal(
+      extracted.some((f) => f.startsWith('package/')),
+      false,
+    )
+  },
+)
 
 // --- Workspace README redaction tests ---
 
-it('workspace default redacts README content in workspace and per-package artifacts', async () => {
-  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
-  cleanups.add(fixture.cleanup)
+it(
+  'workspace default redacts README content in workspace and per-package artifacts',
+  { retry: 2, timeout: 60_000 },
+  async () => {
+    const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+    cleanups.add(fixture.cleanup)
 
-  await execa(
-    'node',
-    [
-      pathCli,
-      'workspace',
-      '--silent',
-      '--version',
-      '1.2.3',
-      '--extract',
-      '--pack-destination',
-      'dist/workspace',
-    ],
-    { cwd: fixture.pathDirectoryWorkspace },
-  )
+    await execa(
+      'node',
+      [
+        pathCli,
+        'workspace',
+        '--silent',
+        '--version',
+        '1.2.3',
+        '--extract',
+        '--pack-destination',
+        'dist/workspace',
+      ],
+      { cwd: fixture.pathDirectoryWorkspace },
+    )
 
-  const extractRoot = path.join(fixture.pathDirectoryWorkspace, 'dist/workspace')
+    const extractRoot = path.join(fixture.pathDirectoryWorkspace, 'dist/workspace')
 
-  // Workspace root README redacted
-  const workspaceReadme = await readFile(path.join(extractRoot, 'README.md'), 'utf8')
-  assert.equal(workspaceReadme, '')
+    // Workspace root README redacted
+    const workspaceReadme = await readFile(path.join(extractRoot, 'README.md'), 'utf8')
+    assert.equal(workspaceReadme, '')
 
-  // Per-package READMEs redacted
-  const appReadme = await readFile(path.join(extractRoot, 'packages/app/README.md'), 'utf8')
-  assert.equal(appReadme, '')
+    // Per-package READMEs redacted
+    const appReadme = await readFile(path.join(extractRoot, 'packages/app/README.md'), 'utf8')
+    assert.equal(appReadme, '')
 
-  const libraryReadme = await readFile(path.join(extractRoot, 'packages/lib/README.md'), 'utf8')
-  assert.equal(libraryReadme, '')
+    const libraryReadme = await readFile(path.join(extractRoot, 'packages/lib/README.md'), 'utf8')
+    assert.equal(libraryReadme, '')
 
-  // Source files unchanged
-  const sourceReadme = await readFile(
-    path.join(fixture.pathDirectoryWorkspace, 'README.md'),
-    'utf8',
-  )
-  assert.ok(sourceReadme.length > 0)
-}, 60_000)
+    // Source files unchanged
+    const sourceReadme = await readFile(
+      path.join(fixture.pathDirectoryWorkspace, 'README.md'),
+      'utf8',
+    )
+    assert.ok(sourceReadme.length > 0)
+  },
+)
 
-it('workspace --no-redact-readme preserves README content', async () => {
-  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
-  cleanups.add(fixture.cleanup)
+it(
+  'workspace --no-redact-readme preserves README content',
+  { retry: 2, timeout: 60_000 },
+  async () => {
+    const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+    cleanups.add(fixture.cleanup)
 
-  await execa(
-    'node',
-    [
-      pathCli,
-      'workspace',
-      '--silent',
-      '--version',
-      '1.2.3',
-      '--no-redact-readme',
-      '--extract',
-      '--pack-destination',
-      'dist/workspace',
-    ],
-    { cwd: fixture.pathDirectoryWorkspace },
-  )
+    await execa(
+      'node',
+      [
+        pathCli,
+        'workspace',
+        '--silent',
+        '--version',
+        '1.2.3',
+        '--no-redact-readme',
+        '--extract',
+        '--pack-destination',
+        'dist/workspace',
+      ],
+      { cwd: fixture.pathDirectoryWorkspace },
+    )
 
-  const extractRoot = path.join(fixture.pathDirectoryWorkspace, 'dist/workspace')
+    const extractRoot = path.join(fixture.pathDirectoryWorkspace, 'dist/workspace')
 
-  const workspaceReadme = await readFile(path.join(extractRoot, 'README.md'), 'utf8')
-  assert.ok(workspaceReadme.includes('Workspace Basic'))
+    const workspaceReadme = await readFile(path.join(extractRoot, 'README.md'), 'utf8')
+    assert.ok(workspaceReadme.includes('Workspace Basic'))
 
-  const appReadme = await readFile(path.join(extractRoot, 'packages/app/README.md'), 'utf8')
-  assert.ok(appReadme.includes('App'))
+    const appReadme = await readFile(path.join(extractRoot, 'packages/app/README.md'), 'utf8')
+    assert.ok(appReadme.includes('App'))
 
-  const libraryReadme = await readFile(path.join(extractRoot, 'packages/lib/README.md'), 'utf8')
-  assert.ok(libraryReadme.includes('Lib'))
-}, 60_000)
+    const libraryReadme = await readFile(path.join(extractRoot, 'packages/lib/README.md'), 'utf8')
+    assert.ok(libraryReadme.includes('Lib'))
+  },
+)

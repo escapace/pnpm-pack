@@ -11,6 +11,7 @@ export const argumentsCommon = {
   '--pack-destination': String,
   '--production': Boolean,
   '--silent': Boolean,
+  '--umask': String,
   '--version': String,
 } as const
 
@@ -30,6 +31,11 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
   const packDestination = options['--pack-destination'] ?? (extract ? 'lib/package' : 'lib')
   const silent = options['--silent'] === true
 
+  const umaskString = options['--umask'] ?? '0o022'
+  const umaskParsed = Number.parseInt(umaskString.replace(/^0o/, ''), 8)
+  assert(!Number.isNaN(umaskParsed) && umaskParsed >= 0 && umaskParsed <= 0o777)
+  const umask = umaskParsed
+
   return {
     build,
     deployment,
@@ -40,6 +46,7 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
     production,
     redactReadme,
     silent,
+    umask,
     version,
   }
 }

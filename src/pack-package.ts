@@ -144,7 +144,14 @@ export async function packPackage() {
       const pathNodeModules = path.join(pathDirectoryDeployment, 'node_modules')
 
       if (await fse.exists(pathNodeModules)) {
-        await fse.move(pathNodeModules, path.join(pathDirectoryTemporaryContext, 'node_modules'))
+        const pathNodeModulesPackaged = path.join(pathDirectoryTemporaryContext, 'node_modules')
+
+        await fse.move(pathNodeModules, pathNodeModulesPackaged)
+
+        // pnpm writes local deployment state here, including volatile timestamps
+        // and absolute store paths. Node runtimes do not need it for module
+        // resolution, and keeping it makes deployment artifacts non-repeatable.
+        await fse.remove(path.join(pathNodeModulesPackaged, '.modules.yaml'))
       }
     }
 

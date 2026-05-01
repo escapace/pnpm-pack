@@ -382,6 +382,7 @@ it('package command with production deploy includes production and optional deps
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/prod-dep/package.json'), true)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/optional-dep/package.json'), true)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/dev-dep/package.json'), false)
+  assert.equal(hasTarEntrySuffix(entries, 'node_modules/.modules.yaml'), false)
 
   const files = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
@@ -420,6 +421,7 @@ it('package command with development deploy includes dev deps only', async () =>
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/dev-dep/package.json'), true)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/prod-dep/package.json'), false)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/optional-dep/package.json'), false)
+  assert.equal(hasTarEntrySuffix(entries, 'node_modules/.modules.yaml'), false)
 
   const files = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
@@ -459,6 +461,7 @@ it('package command with production deploy and no-optional excludes optional dep
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/prod-dep/package.json'), true)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/optional-dep/package.json'), false)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/dev-dep/package.json'), false)
+  assert.equal(hasTarEntrySuffix(entries, 'node_modules/.modules.yaml'), false)
 
   const files = await listFilesRelative(fixture.pathDirectoryWorkspace)
 
@@ -562,6 +565,7 @@ it('package extract with production deploy produces files at destination root', 
     extracted.some((f) => f.startsWith('packages/')),
     false,
   )
+  assert.equal(extracted.includes('node_modules/.modules.yaml'), false)
 }, 30_000)
 
 // --- README redaction tests ---

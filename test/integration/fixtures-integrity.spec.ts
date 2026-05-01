@@ -58,13 +58,7 @@ it('fixtures keep workspace dependency references internally consistent', async 
 
     const pathDirectoryPackages = path.join(fixture, 'packages')
 
-    let packageDirectories: string[] = []
-
-    try {
-      packageDirectories = await listDirectories(pathDirectoryPackages)
-    } catch {
-      packageDirectories = []
-    }
+    const packageDirectories = await listDirectories(pathDirectoryPackages).catch(() => [])
 
     const packageJSONs = await Promise.all(
       packageDirectories.map(async (directory) => ({

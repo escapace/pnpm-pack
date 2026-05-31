@@ -24,7 +24,7 @@
   "devDependencies": {
     "@commitlint/cli": "21.0.1",
     "@commitlint/config-conventional": "21.0.1",
-    "@escapace/syncpack-configuration": "0.2.0",
+    "@escapace/syncpack-configuration": "0.3.0",
     "@ls-lint/ls-lint": "2.3.1",
     "@types/archiver": "7.0.0",
     "@types/fs-extra": "11.0.4",

@@ -1,4 +1,4 @@
-import archiver from 'archiver'
+import { TarArchive, ZipArchive } from 'archiver'
 import { createWriteStream } from 'node:fs'
 import { lstat, readdir, readlink } from 'node:fs/promises'
 import path from 'node:path'
@@ -6,8 +6,16 @@ import { applyUmask } from './normalize-permissions'
 
 export type ArchiveFormat = 'tgz' | 'zip'
 
+type ArchiveWriter = TarArchive | ZipArchive
+
+function createArchiveWriter(format: ArchiveFormat): ArchiveWriter {
+  return format === 'zip'
+    ? new ZipArchive({ zlib: { level: 9 } })
+    : new TarArchive({ gzip: true, gzipOptions: { level: 9 } })
+}
+
 async function addDirectoryEntries(
-  archive: archiver.Archiver,
+  archive: ArchiveWriter,
   sourceDirectory: string,
   entryPrefix: string,
   umask: number,
@@ -38,10 +46,7 @@ export async function createArchive(options: {
   sourceDirectory: string
   umask: number
 }): Promise<void> {
-  const archive =
-    options.format === 'zip'
-      ? archiver('zip', { zlib: { level: 9 } })
-      : archiver('tar', { gzip: true, gzipOptions: { level: 9 } })
+  const archive = createArchiveWriter(options.format)
 
   const output = createWriteStream(options.outputPath)
 

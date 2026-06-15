@@ -7,52 +7,52 @@ importers:
     configDependencies: {}
     packageManagerDependencies:
       '@pnpm/exe':
-        specifier: 11.5.2
-        version: 11.5.2
+        specifier: 11.6.0
+        version: 11.6.0
       pnpm:
-        specifier: 11.5.2
-        version: 11.5.2
+        specifier: 11.6.0
+        version: 11.6.0
 
 packages:
 
-  '@pnpm/exe@11.5.2':
-    resolution: {integrity: sha512-4UFnP2rhNu1xjAQ+I1GdIUUEtCJuTYJlbpiWSFA4POAID3Lpt+2vrjImWO7eOJ7iCY3vpc4TFe2IW3sAolW4Kg==}
+  '@pnpm/exe@11.6.0':
+    resolution: {integrity: sha512-CguaA9vPwP8IMpgbGp2Pbhek7GxvAWvm7orXaguA5Hr07BVvCiQqH5O0FbLwMdTBos0wb8AvsTHlZrLGehkQHw==}
     hasBin: true
 
-  '@pnpm/linux-arm64@11.5.2':
-    resolution: {integrity: sha512-MbJySnu2y9cCBqlODLjUlZ87JnRC3Inq40rvGHWJSrSQ0PnuHeSw2NDMnLI8Hf9hCY+ooussRc5iiR4IAkjUvg==}
+  '@pnpm/linux-arm64@11.6.0':
+    resolution: {integrity: sha512-NaGjtSDjXt1xI0i7oZgOZREEpWVf4+1jtNVUoCKwp0kTm10S5kd98IHoaHtlYCQ+sHRTezFsNq4ex42lbq2Nug==}
     cpu: [arm64]
     os: [linux]
 
-  '@pnpm/linux-x64@11.5.2':
-    resolution: {integrity: sha512-g6g2BGpQA47wUACy6B1MdeSHPtnl6x4AeCg0IOWQ7xXorEtC+VRiSHhLpA5kByFGeSwyYh/nLc7mLul5DAaELw==}
+  '@pnpm/linux-x64@11.6.0':
+    resolution: {integrity: sha512-9KUcSliUBxaLz/9Zvulnb3gy6K1UW86uuVHA65yX36I2Bqs151E+roMfVlLJqhfK+p+GP5xaUpLdNbmDj/bskg==}
     cpu: [x64]
     os: [linux]
 
-  '@pnpm/linuxstatic-arm64@11.5.2':
-    resolution: {integrity: sha512-xTxs9BLxYW39BPNGnmvYCUBnMPWm4mzmzujmdYbpRxDnBXrx55qPR5K/3LSohX7VrmsdDrYxuH6AmG1AaOlIfA==}
+  '@pnpm/linuxstatic-arm64@11.6.0':
+    resolution: {integrity: sha512-iqGJk/3v/Thrr/7ngDMK7knmjdkG162zz3cnvkeYqj/bvnpQU6LrfCBLjncaSUbEuekpnDj7Y7Ob1dtWpGp+lA==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@pnpm/linuxstatic-x64@11.5.2':
-    resolution: {integrity: sha512-RGmmc/SoGLD90gmOHcU85UEKNoNRstLvizli4wzDASmETz/VeqJOqU5nD1YBgjzcP72sUMS352dh4bmzTfKyvQ==}
+  '@pnpm/linuxstatic-x64@11.6.0':
+    resolution: {integrity: sha512-R+aKPOmTrXym7hcpmsQMPj8BgqWTkQyMbLMhozKWal3vQ/AaN7JlIzuL8ZG+1kn+o+7cQ6woG6esK54ZCFtfPg==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@pnpm/macos-arm64@11.5.2':
-    resolution: {integrity: sha512-gW3A2jRlC3SJRw8qX2SAzjMIu9o98daTSqCKzeeYcjF/uEbtbz3dn4HqYrYffBnenKbc4hsgZQmNOHAvUKIlSg==}
+  '@pnpm/macos-arm64@11.6.0':
+    resolution: {integrity: sha512-vN9NjAn0rC9qIwnSkEY6Ep330HvZGP0umR/VYcH2xNcKzTclhlLVngXfAl70pxDu2VqcHo6+n/XVp7PwLG6JuA==}
     cpu: [arm64]
     os: [darwin]
 
-  '@pnpm/win-arm64@11.5.2':
-    resolution: {integrity: sha512-+VJCDoH/pRzLXBikwjvxgAnGfQufT8EALBX8cfSmrwD40JABUZvgPtjBjde7OwEoK/XwtlH8w+ZceFV0K3/YHQ==}
+  '@pnpm/win-arm64@11.6.0':
+    resolution: {integrity: sha512-ubXglpUji9C3AEWMBsadgDvMF1hKRuO8kg/UjY4RDWO/omMVR0gt87B7guLGnuWYOZOyBgqvE6SdnP84w1wMyA==}
     cpu: [arm64]
     os: [win32]
 
-  '@pnpm/win-x64@11.5.2':
-    resolution: {integrity: sha512-zgglREh75RbFgV/E0tNRS03ElX+hJOV43KRSSeaboxtj3ei1rrguxOgOCXUs/GsizoHVsuD+qXGABE4Kc4GMCg==}
+  '@pnpm/win-x64@11.6.0':
+    resolution: {integrity: sha512-3PuRzVgr/uoGBnICdUHox04hjebH1KZUsH4nz3o8RrGOFa9FCcIezRIOd8M+wrw8buvWFH5ZavFDucEynLzLRw==}
     cpu: [x64]
     os: [win32]
 
@@ -116,45 +116,45 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
-  pnpm@11.5.2:
-    resolution: {integrity: sha512-ccYx44IGbvwlYl1c8CkHXeB7YbN/bic1D72Esb2lhkyMGWetwoB3a0XDCnFcA1mjvgj+9C1bsJ4rmQKZeWkpFg==}
+  pnpm@11.6.0:
+    resolution: {integrity: sha512-mjZRgiQIDG/lFlr9z+eb+hGMKb5wPz9GKx4y7+HpjkfodQsUjggoYlCq1BE8x5k8pBPE4s1Ed1JwjC7ldRvJXw==}
     engines: {node: '>=22.13'}
     hasBin: true
 
 snapshots:
 
-  '@pnpm/exe@11.5.2':
+  '@pnpm/exe@11.6.0':
     dependencies:
       '@reflink/reflink': 0.1.19
       detect-libc: 2.1.2
     optionalDependencies:
-      '@pnpm/linux-arm64': 11.5.2
-      '@pnpm/linux-x64': 11.5.2
-      '@pnpm/linuxstatic-arm64': 11.5.2
-      '@pnpm/linuxstatic-x64': 11.5.2
-      '@pnpm/macos-arm64': 11.5.2
-      '@pnpm/win-arm64': 11.5.2
-      '@pnpm/win-x64': 11.5.2
+      '@pnpm/linux-arm64': 11.6.0
+      '@pnpm/linux-x64': 11.6.0
+      '@pnpm/linuxstatic-arm64': 11.6.0
+      '@pnpm/linuxstatic-x64': 11.6.0
+      '@pnpm/macos-arm64': 11.6.0
+      '@pnpm/win-arm64': 11.6.0
+      '@pnpm/win-x64': 11.6.0
 
-  '@pnpm/linux-arm64@11.5.2':
+  '@pnpm/linux-arm64@11.6.0':
     optional: true
 
-  '@pnpm/linux-x64@11.5.2':
+  '@pnpm/linux-x64@11.6.0':
     optional: true
 
-  '@pnpm/linuxstatic-arm64@11.5.2':
+  '@pnpm/linuxstatic-arm64@11.6.0':
     optional: true
 
-  '@pnpm/linuxstatic-x64@11.5.2':
+  '@pnpm/linuxstatic-x64@11.6.0':
     optional: true
 
-  '@pnpm/macos-arm64@11.5.2':
+  '@pnpm/macos-arm64@11.6.0':
     optional: true
 
-  '@pnpm/win-arm64@11.5.2':
+  '@pnpm/win-arm64@11.6.0':
     optional: true
 
-  '@pnpm/win-x64@11.5.2':
+  '@pnpm/win-x64@11.6.0':
     optional: true
 
   '@reflink/reflink-darwin-arm64@0.1.19':
@@ -194,7 +194,7 @@ snapshots:
 
   detect-libc@2.1.2: {}
 
-  pnpm@11.5.2: {}
+  pnpm@11.6.0: {}
 
 ---
 lockfileVersion: '9.0'
@@ -231,7 +231,7 @@ importers:
         version: 11.3.5
       semver:
         specifier: ^7.8.1
-        version: 7.8.1
+        version: 7.8.2
       which:
         specifier: ^7.0.0
         version: 7.0.0
@@ -2969,8 +2969,8 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  semver@7.8.1:
-    resolution: {integrity: sha512-rkVq3IXh+4FDGch+KwzX3aV9W3kO54GyEgpvBzSyctDA6Xtd7RJQV1xmXbeQp5v7+VzLOfVqiutSE6GICgPFvg==}
+  semver@7.8.2:
+    resolution: {integrity: sha512-c8jsqUZm3omBOI66G90z1Dyw5z622G8oLG+omfsHBJf3CWQTlOcwOjvOG6wtiNfW6anKm/eA39LMwMtMez2TiQ==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -3488,7 +3488,7 @@ snapshots:
   '@commitlint/is-ignored@21.0.2':
     dependencies:
       '@commitlint/types': 21.0.1
-      semver: 7.8.1
+      semver: 7.8.2
 
   '@commitlint/lint@21.0.2':
     dependencies:
@@ -3560,7 +3560,7 @@ snapshots:
     dependencies:
       '@simple-libs/child-process-utils': 1.0.2
       '@simple-libs/stream-utils': 1.2.0
-      semver: 7.8.1
+      semver: 7.8.2
     optionalDependencies:
       conventional-commits-parser: 6.4.0
 
@@ -3919,7 +3919,7 @@ snapshots:
     dependencies:
       '@pnpm/crypto.base32-hash': 3.0.0
       '@pnpm/types': 11.1.0
-      semver: 7.8.1
+      semver: 7.8.2
 
   '@pnpm/error@1000.1.0':
     dependencies:
@@ -3955,7 +3955,7 @@ snapshots:
       '@pnpm/resolver-base': 13.0.1
       graceful-git: 4.0.0
       hosted-git-info: '@pnpm/hosted-git-info@1.0.0'
-      semver: 7.8.1
+      semver: 7.8.2
     transitivePeerDependencies:
       - '@pnpm/logger'
       - domexception
@@ -3987,7 +3987,7 @@ snapshots:
       js-yaml: '@zkochan/js-yaml@0.0.7'
       normalize-path: 3.0.0
       ramda: '@pnpm/ramda@0.28.1'
-      semver: 7.8.1
+      semver: 7.8.2
       sort-keys: 4.2.0
       strip-bom: 4.0.0
       write-file-atomic: 5.0.1
@@ -4020,7 +4020,7 @@ snapshots:
       '@pnpm/types': 11.1.0
       comver-to-semver: 1.0.0
       ramda: '@pnpm/ramda@0.28.1'
-      semver: 7.8.1
+      semver: 7.8.2
 
   '@pnpm/network.agent@2.0.3':
     dependencies:
@@ -4378,7 +4378,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.60.0
       debug: 4.4.3
       minimatch: 10.2.5
-      semver: 7.8.1
+      semver: 7.8.2
       tinyglobby: 0.2.16
       ts-api-utils: 2.5.0(typescript@6.0.3)
       typescript: 6.0.3
@@ -4877,7 +4877,7 @@ snapshots:
       empathic: 2.0.1
       eslint: 10.4.1(jiti@2.7.0)
       module-replacements: 2.11.0
-      semver: 7.8.1
+      semver: 7.8.2
 
   eslint-plugin-es-x@9.6.0(eslint@10.4.1):
     dependencies:
@@ -4955,7 +4955,7 @@ snapshots:
       pluralize: 8.0.0
       regexp-tree: 0.1.27
       regjsparser: 0.13.1
-      semver: 7.8.1
+      semver: 7.8.2
       strip-indent: 4.1.1
 
   eslint-plugin-vue@10.9.1(@stylistic/eslint-plugin@5.10.0)(@typescript-eslint/parser@8.60.0)(eslint@10.4.1)(vue-eslint-parser@10.4.0):
@@ -4965,7 +4965,7 @@ snapshots:
       natural-compare: 1.4.0
       nth-check: 2.1.1
       postcss-selector-parser: 7.1.1
-      semver: 7.8.1
+      semver: 7.8.2
       vue-eslint-parser: 10.4.0(eslint@10.4.1)
       xml-name-validator: 4.0.0
     optionalDependencies:
@@ -5406,7 +5406,7 @@ snapshots:
     dependencies:
       acorn: 8.16.0
       eslint-visitor-keys: 5.0.1
-      semver: 7.8.1
+      semver: 7.8.2
 
   jsonfile@6.2.1:
     dependencies:
@@ -5566,7 +5566,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.8.1
+      semver: 7.8.2
 
   markdown-table@3.0.4: {}
 
@@ -6143,7 +6143,7 @@ snapshots:
 
   semver@7.7.4: {}
 
-  semver@7.8.1: {}
+  semver@7.8.2: {}
 
   shebang-command@2.0.0:
     dependencies:
@@ -6451,7 +6451,7 @@ snapshots:
       eslint-visitor-keys: 5.0.1
       espree: 11.2.0
       esquery: 1.7.0
-      semver: 7.8.1
+      semver: 7.8.2
     transitivePeerDependencies:
       - supports-color
 

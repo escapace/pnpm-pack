@@ -13,6 +13,7 @@ import { createArchive } from './utilities/create-archive'
 import { getNameArchive } from './utilities/get-name-archive'
 import { getPathDirectoryWorkspace } from './utilities/get-path-directory-workspace'
 import { normalizePathDirectoryDestination } from './utilities/normalize-path-directory-destination'
+import { removePnpmPackageMapFiles } from './utilities/prepare-deployment-node-modules'
 import { normalizePermissionsRecursive } from './utilities/normalize-permissions'
 import { readPackageJSON } from './utilities/read-package-json'
 import { getExecaStdio } from './utilities/get-execa-stdio'
@@ -191,6 +192,8 @@ export async function packWorkspace() {
         }
       }
     }
+
+    await removePnpmPackageMapFiles(pathDirectoryTemporaryContext)
 
     await createArchive({
       entryPrefix: 'package',

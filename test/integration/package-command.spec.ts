@@ -4,7 +4,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { afterEach, it } from 'vitest'
 import { prepareFixture } from '../support/prepare-fixture'
-import { listFilesRelative } from '../support/list-files-relative'
+import { listFilesRelative as listFilesRelativeRaw } from '../support/list-files-relative'
 import { listTarEntries } from '../support/tar'
 import { runCli } from './run-cli'
 
@@ -51,6 +51,20 @@ const assertPackageVersion = async (pathDirectoryPackage: string, version: strin
 
 const hasTarEntrySuffix = (entries: string[], suffix: string) =>
   entries.some((value) => value.endsWith(suffix))
+
+const assertNoPackageMapEntries = (entries: string[]) => {
+  assert.equal(
+    entries.some((entry) => entry.includes('.package-map.json')),
+    false,
+  )
+}
+
+const listFilesRelative = async (directory: string) =>
+  (await listFilesRelativeRaw(directory)).filter(
+    (file) => file !== 'node_modules/.package-map.json',
+  )
+
+const listFilesRelativeIncludingPnpmMetadata = listFilesRelativeRaw
 
 const filesWorkspaceDeployBase = [
   'node_modules/.pnpm-workspace-state-v1.json',
@@ -379,6 +393,7 @@ it('package command with production deploy includes production and optional deps
 
   const entries = await listTarEntries(pathArchive)
 
+  assertNoPackageMapEntries(entries)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/prod-dep/package.json'), true)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/optional-dep/package.json'), true)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/dev-dep/package.json'), false)
@@ -418,6 +433,7 @@ it('package command with development deploy includes dev deps only', async () =>
 
   const entries = await listTarEntries(pathArchive)
 
+  assertNoPackageMapEntries(entries)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/dev-dep/package.json'), true)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/prod-dep/package.json'), false)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/optional-dep/package.json'), false)
@@ -458,6 +474,7 @@ it('package command with production deploy and no-optional excludes optional dep
 
   const entries = await listTarEntries(pathArchive)
 
+  assertNoPackageMapEntries(entries)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/prod-dep/package.json'), true)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/optional-dep/package.json'), false)
   assert.equal(hasTarEntrySuffix(entries, 'node_modules/@fixture/dev-dep/package.json'), false)
@@ -493,7 +510,9 @@ it('package extract without repack produces files at destination root', async ()
     assert.equal(error, undefined)
   })
 
-  const extracted = await listFilesRelative(path.join(pathDirectoryPackage, 'out'))
+  const extracted = await listFilesRelativeIncludingPnpmMetadata(
+    path.join(pathDirectoryPackage, 'out'),
+  )
 
   assert.deepEqual(extracted, ['README.md', 'index.js', 'package.json'])
 }, 30_000)
@@ -519,7 +538,9 @@ it('package extract with default redaction produces files at destination root', 
     assert.equal(error, undefined)
   })
 
-  const extracted = await listFilesRelative(path.join(pathDirectoryPackage, 'out'))
+  const extracted = await listFilesRelativeIncludingPnpmMetadata(
+    path.join(pathDirectoryPackage, 'out'),
+  )
 
   // Same shape as scenario 1 — no prefix drift
   assert.deepEqual(extracted, ['README.md', 'index.js', 'package.json'])
@@ -559,8 +580,11 @@ it('package extract with production deploy produces files at destination root', 
     path.join(pathDirectoryPackage, 'out/node_modules/@fixture/prod-dep/package.json'),
   )
 
-  const extracted = await listFilesRelative(path.join(pathDirectoryPackage, 'out'))
+  const extracted = await listFilesRelativeIncludingPnpmMetadata(
+    path.join(pathDirectoryPackage, 'out'),
+  )
 
+  assertNoPackageMapEntries(extracted)
   assert.equal(
     extracted.some((f) => f.startsWith('packages/')),
     false,

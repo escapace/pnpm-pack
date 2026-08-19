@@ -27,7 +27,7 @@
     "@escapace/syncpack-configuration": "0.3.0",
     "@ls-lint/ls-lint": "2.3.1",
     "@types/fs-extra": "11.0.4",
-    "@types/node": "24.13.3",
+    "@types/node": "24.13.2",
     "@types/semver": "7.8.0",
     "@types/which": "3.0.4",
     "@vitest/coverage-v8": "4.1.10",
@@ -47,12 +47,12 @@
     "packageManager": {
       "name": "pnpm",
       "onFail": "warn",
-      "version": "^11.5.0"
+      "version": "^11.20.0"
     },
     "runtime": {
       "name": "node",
       "onFail": "warn",
-      "version": "^24.15.0"
+      "version": "^24.16.0"
     }
   },
   "engines": {
@@ -79,13 +79,13 @@
   "repository": "escapace/pnpm-pack",
   "scripts": {
     "build": "tsx scripts/build.ts",
-    "format": "syncpack format && eslint --no-warn-ignored --fix && prettier --no-error-on-unmatched-pattern -uw .",
+    "format": "syncpack format && eslint --no-warn-ignored --fix && prettier --log-level warn --no-error-on-unmatched-pattern -uw .",
     "lint": "ls-lint --config .ls-lint.yaml && knip --no-config-hints && eslint",
     "ls-lint": "ls-lint --config .ls-lint.yaml",
     "pack": "node lib/node/cli.js package --pack-destination lib",
     "prepare": "lefthook install",
     "syncpack": "syncpack fix && syncpack format",
-    "test": "vitest --no-watch --coverage",
+    "test": "vitest --no-watch --coverage --coverage.reporter=text-summary",
     "typecheck": "tsc --noEmit",
     "update": "ncu --cooldown 7 -p pnpm -u --peer --dep dev,peer,prod,optional && pnpm run syncpack"
   },

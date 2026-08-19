@@ -90,6 +90,50 @@ it(
 )
 
 it(
+  'workspace command production deploy omits pnpm package map metadata',
+  { retry: 2, timeout: 60_000 },
+  async () => {
+    const fixture = await prepareFixture({ fixture: 'workspace-deploy-flags' })
+    cleanups.add(fixture.cleanup)
+
+    await execa(
+      'node',
+      [
+        pathCli,
+        'workspace',
+        '--silent',
+        '--version',
+        '1.2.3',
+        '--production',
+        '--pack-destination',
+        'dist',
+        '--workspace-concurrency',
+        '1',
+      ],
+      { cwd: fixture.pathDirectoryWorkspace },
+    )
+
+    const pathArchive = path.join(
+      fixture.pathDirectoryWorkspace,
+      'dist/workspace-deploy-flags-root-1.2.3.tgz',
+    )
+
+    assert.equal(await fileExists(pathArchive), true)
+
+    const entries = await listTarEntries(pathArchive)
+
+    assert.equal(
+      entries.some((entry) => entry.includes('.package-map.json')),
+      false,
+    )
+    assert.equal(
+      hasTarEntrySuffix(entries, 'packages/app/node_modules/@fixture/prod-dep/package.json'),
+      true,
+    )
+  },
+)
+
+it(
   'workspace command honors filter-prod by excluding dev dependency projects',
   { retry: 2, timeout: 60_000 },
   async () => {

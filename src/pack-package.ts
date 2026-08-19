@@ -18,6 +18,10 @@ import { normalizePermissionsRecursive } from './utilities/normalize-permissions
 import { readPackageJSON } from './utilities/read-package-json'
 import { writeFileJSON } from './utilities/write-file-json'
 import { pnpmVersion as _pnpmVersion } from './utilities/pnpm-version'
+import {
+  materializeExternalWorkspacePackageLinks,
+  removePnpmPackageMapFiles,
+} from './utilities/prepare-deployment-node-modules'
 import { getExecaStdio } from './utilities/get-execa-stdio'
 import { redactReadmeLikeFile } from './utilities/redact-readme-like-file'
 
@@ -146,12 +150,19 @@ export async function packPackage() {
       if (await fse.exists(pathNodeModules)) {
         const pathNodeModulesPackaged = path.join(pathDirectoryTemporaryContext, 'node_modules')
 
+        await materializeExternalWorkspacePackageLinks({
+          deploymentDirectory: pathDirectoryDeployment,
+          nodeModulesDirectory: pathNodeModules,
+          workspaceDirectory: pathDirectoryRoot,
+        })
         await fse.move(pathNodeModules, pathNodeModulesPackaged)
 
-        // pnpm writes local deployment state here, including volatile timestamps
-        // and absolute store paths. Node runtimes do not need it for module
-        // resolution, and keeping it makes deployment artifacts non-repeatable.
+        // pnpm writes local deployment state here, including volatile timestamps,
+        // absolute store paths, and workspace package maps. Node runtimes do not
+        // need it for module resolution, and keeping it makes deployment
+        // artifacts non-repeatable.
         await fse.remove(path.join(pathNodeModulesPackaged, '.modules.yaml'))
+        await removePnpmPackageMapFiles(pathNodeModulesPackaged)
       }
     }
 

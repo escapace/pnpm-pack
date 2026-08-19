@@ -192,6 +192,10 @@ it('package command creates zip with production deploy', async () => {
   const entries = await listZipEntries(pathArchive)
 
   assert.equal(
+    entries.some((entry) => entry.includes('.package-map.json')),
+    false,
+  )
+  assert.equal(
     entries.some((entry) => entry.includes('node_modules')),
     true,
   )

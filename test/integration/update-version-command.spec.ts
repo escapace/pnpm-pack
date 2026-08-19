@@ -4,7 +4,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { afterEach, it } from 'vitest'
 import { prepareFixture } from '../support/prepare-fixture'
-import { listFilesRelative } from '../support/list-files-relative'
+import { listFilesRelative as listFilesRelativeRaw } from '../support/list-files-relative'
 import { runCli } from './run-cli'
 
 const cleanups = new Set<() => Promise<void>>()
@@ -28,6 +28,11 @@ const runInDirectory = async (directory: string, function_: () => Promise<void>)
     process.chdir(cwd)
   }
 }
+
+const listFilesRelative = async (directory: string) =>
+  (await listFilesRelativeRaw(directory)).filter(
+    (file) => file !== 'node_modules/.package-map.json',
+  )
 
 it('update-version updates nearest package from nested cwd', async () => {
   const fixture = await prepareFixture({ fixture: 'workspace-single-package' })

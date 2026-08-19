@@ -4,6 +4,7 @@ allowBuilds:
 blockExoticSubdeps: true
 childConcurrency: 1
 dedupePeers: true
+loglevel: warn
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@caslon/*'
@@ -37,9 +38,9 @@ strictDepBuilds: true
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - '@eslint/*'
+  - ast-v8-to-istanbul@1.0.2
   - eslint
   - tinyexec@1.2.1
   - tinyexec@1.2.2
   - ts-api-utils@2.3.0
-  - ast-v8-to-istanbul@1.0.2
 verifyDepsBeforeRun: false

@@ -26,7 +26,7 @@ By default, artifacts are written to `./lib`. With `--extract`, the destination 
 - `--no-optional` omits optional dependencies when `--production` or `--development` is used.
 - `--no-redact-readme` keeps README-like file contents in packaged artifacts.
 - `--umask <octal>` sets the file permission umask applied to archive entries and extracted files. Default: `0o022`. Use `--umask 0` to disable permission normalization.
-- `--silent` suppresses output from child commands (`pnpm`, `tar`, and build scripts).
+- `--verbose` shows output from child commands (`pnpm`, `tar`, and build scripts). Child command output is suppressed by default.
 
 Destination constraints:
 

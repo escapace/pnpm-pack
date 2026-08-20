@@ -12,6 +12,7 @@ export const argumentsCommon = {
   '--production': Boolean,
   '--silent': Boolean,
   '--umask': String,
+  '--verbose': Boolean,
   '--version': String,
 } as const
 
@@ -29,7 +30,8 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
   const redactReadme = options['--no-redact-readme'] !== true
   const extract = options['--extract'] === true
   const packDestination = options['--pack-destination'] ?? (extract ? 'lib/package' : 'lib')
-  const silent = options['--silent'] === true
+  const verbose = options['--verbose'] === true
+  const silent = !verbose
 
   const umaskString = options['--umask'] ?? '0o022'
   const umaskParsed = Number.parseInt(umaskString.replace(/^0o/, ''), 8)
@@ -47,6 +49,7 @@ export const argumentsCommonParse = <T extends arg.Result<typeof argumentsCommon
     redactReadme,
     silent,
     umask,
+    verbose,
     version,
   }
 }

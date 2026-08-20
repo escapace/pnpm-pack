@@ -29,7 +29,7 @@ const helpMessage = [
   '  --no-optional              Omit optional dependencies with deployment options.',
   '  --no-redact-readme         Keep README-like file contents in packaged artifacts.',
   '  --umask <octal>            Set file permission umask for archive entries (default: 0o022).',
-  '  --silent                   Suppress output from child commands.',
+  '  --verbose                  Show output from child commands.',
   '',
   'Workspace selection options:',
   '  --filter <selector>                    Select workspace packages using pnpm filtering selectors.',

@@ -5,7 +5,8 @@ export async function runCli(argv: string[]) {
   const argvEffective =
     argv.length > 0 &&
     ['package', 'workspace'].includes(argv[0] ?? '') &&
-    !argv.includes('--silent')
+    !argv.includes('--silent') &&
+    !argv.includes('--verbose')
       ? [argv[0], '--silent', ...argv.slice(1)]
       : argv
 

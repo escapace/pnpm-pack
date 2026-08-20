@@ -124,7 +124,7 @@ export async function packWorkspace() {
         options.noOptional ? '--no-optional' : undefined,
         options.production ? '--production' : undefined,
         options.redactReadme ? undefined : '--no-redact-readme',
-        options.silent ? '--silent' : undefined,
+        options.verbose ? '--verbose' : '--silent',
         options.extract ? '--extract' : undefined,
         '--umask',
         `0o${options.umask.toString(8)}`,

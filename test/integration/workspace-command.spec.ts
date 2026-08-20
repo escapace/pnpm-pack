@@ -1,5 +1,6 @@
 import assert from 'node:assert'
-import { access, readFile } from 'node:fs/promises'
+import { access, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import { execa } from 'execa'
 import { afterEach, it } from 'vitest'
@@ -88,6 +89,56 @@ it(
     )
   },
 )
+
+it('workspace command handles combined pnpm lockfiles', { retry: 2, timeout: 60_000 }, async () => {
+  const fixture = await prepareFixture({ fixture: 'workspace-basic' })
+  cleanups.add(fixture.cleanup)
+
+  const pathFileLockfile = path.join(fixture.pathDirectoryWorkspace, 'pnpm-lock.yaml')
+  const contentLockfile = await readFile(pathFileLockfile, 'utf8')
+
+  await writeFile(
+    pathFileLockfile,
+    `---
+lockfileVersion: '9.0'
+importers:
+
+  .:
+    packageManagerDependencies:
+      pnpm:
+        specifier: 11.20.0
+        version: 11.20.0
+
+---
+${contentLockfile}`,
+  )
+
+  await execa(
+    'node',
+    [pathCli, 'workspace', '--silent', '--version', '1.2.3', '--pack-destination', 'dist'],
+    { cwd: fixture.pathDirectoryWorkspace },
+  )
+
+  const pathArchive = path.join(
+    fixture.pathDirectoryWorkspace,
+    'dist/fixture-workspace-basic-root-1.2.3.tgz',
+  )
+  const pathDirectoryArchive = await mkdtemp(path.join(os.tmpdir(), 'pnpm-pack-archive-'))
+  cleanups.add(async () => {
+    await rm(pathDirectoryArchive, { force: true, recursive: true })
+  })
+
+  await execa('tar', ['-xzf', pathArchive, '-C', pathDirectoryArchive])
+
+  const contentPackagedLockfile = await readFile(
+    path.join(pathDirectoryArchive, 'package/pnpm-lock.yaml'),
+    'utf8',
+  )
+
+  assert.equal(contentPackagedLockfile.includes('lockfileVersion:'), true)
+  assert.equal(contentPackagedLockfile.includes('specifier: workspace:'), false)
+  assert.equal(contentPackagedLockfile.includes('specifier: 1.2.3'), true)
+})
 
 it(
   'workspace command production deploy omits pnpm package map metadata',

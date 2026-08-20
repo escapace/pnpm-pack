@@ -1,4 +1,4 @@
-import { readWantedLockfileAndAutofixConflicts, writeWantedLockfile } from '@pnpm/lockfile-file'
+import { readWantedLockfileAndAutofixConflicts, writeWantedLockfile } from '@pnpm/lockfile.fs'
 import arg from 'arg'
 import { execa } from 'execa'
 import fse from 'fs-extra'

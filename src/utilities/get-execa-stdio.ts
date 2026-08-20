@@ -1,4 +1,3 @@
-import type { Options as ExecaOptions } from 'execa'
+type ExecaStdio = 'ignore' | 'inherit'
 
-export const getExecaStdio = (silent: boolean): ExecaOptions['stdio'] =>
-  silent ? 'ignore' : 'inherit'
+export const getExecaStdio = (silent: boolean): ExecaStdio => (silent ? 'ignore' : 'inherit')

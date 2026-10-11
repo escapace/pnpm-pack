@@ -11,7 +11,7 @@
   },
   "bugs": "https://github.com/escapace/pnpm-pack/issues",
   "dependencies": {
-    "@pnpm/lockfile.fs": "^1100.2.8",
+    "@pnpm/lockfile.fs": "^1100.2.12",
     "archiver": "^8.0.0",
     "arg": "^5.0.2",
     "es-toolkit": "^1.52.0",
@@ -27,21 +27,21 @@
     "@escapace/syncpack-configuration": "0.3.0",
     "@ls-lint/ls-lint": "2.3.1",
     "@types/fs-extra": "11.0.4",
-    "@types/node": "24.13.6",
+    "@types/node": "24.19.1",
     "@types/semver": "7.8.0",
     "@types/which": "3.0.4",
-    "@vitest/coverage-v8": "5.0.2",
-    "eslint": "10.11.0",
+    "@vitest/coverage-v8": "5.0.3",
+    "eslint": "10.12.0",
     "eslint-config-escapace": "5.20.4",
     "esroll": "1.3.1",
-    "knip": "6.37.0",
-    "lefthook": "2.1.14",
+    "knip": "6.39.0",
+    "lefthook": "2.1.16",
     "prettier": "3.9.9",
     "prettier-config-escapace": "1.2.2",
     "syncpack": "15.3.3",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
-    "vitest": "5.0.2"
+    "vitest": "5.0.3"
   },
   "devEngines": {
     "packageManager": {
